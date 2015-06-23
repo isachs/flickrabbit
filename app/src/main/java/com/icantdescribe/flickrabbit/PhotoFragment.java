@@ -34,7 +34,7 @@ public class PhotoFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         long photoId = (long) getArguments().getSerializable(ARG_PHOTO_ID);
-        mPhoto = PhotoLab.get(getActivity()).getCrime(crimeId);
+        mPhoto = PhotoGallery.get(getActivity()).getPhoto(photoId);
     }
 
     @Override

@@ -14,7 +14,7 @@ public class PhotoGallery {
 
     private PhotoGallery(Context context) {
         mPhotos = new ArrayList<>();
-        // fill below
+        // fill below - in future from API
         Photo photo = new Photo(18884532229L, "38637224@N00", "f499655622", 271, 1);
         mPhotos.add(photo);
     }
@@ -27,7 +27,7 @@ public class PhotoGallery {
         return mPhotos;
     }
 
-    public Photo getPhoto(int id) {
+    public Photo getPhoto(long id) {
         for (Photo photo : mPhotos) {
             if (photo.getId() == id) {
                 return photo;

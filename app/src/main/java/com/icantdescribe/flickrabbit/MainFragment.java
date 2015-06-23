@@ -1,26 +1,14 @@
 package com.icantdescribe.flickrabbit;
 
-import android.content.Context;
 import android.content.Intent;
-import android.content.res.Configuration;
-import android.database.DataSetObserver;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.CheckBox;
-import android.widget.GridView;
 import android.widget.ImageView;
-import android.widget.ListAdapter;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import com.nostra13.universalimageloader.cache.memory.impl.WeakMemoryCache;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
@@ -28,8 +16,6 @@ import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 import com.nostra13.universalimageloader.core.assist.ImageScaleType;
 
-import java.lang.reflect.Field;
-import java.util.ArrayList;
 import java.util.List;
 
 public class MainFragment extends Fragment {
@@ -41,9 +27,20 @@ public class MainFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_photo_list, container, false);
+        DisplayImageOptions defaultOptions = new DisplayImageOptions.Builder()
+                .cacheOnDisc(true).cacheInMemory(true)
+                .imageScaleType(ImageScaleType.EXACTLY).build();
+
+        ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(getActivity())
+                .defaultDisplayImageOptions(defaultOptions)
+                .memoryCache(new WeakMemoryCache())
+                .discCacheSize(100 * 1024 * 1024).build();
+
+        ImageLoader.getInstance().init(config);
+
+        View view = inflater.inflate(R.layout.fragment_photo_grid, container, false);
         mPhotoRecyclerView = (RecyclerView) view.findViewById(R.id.photo_recycler_view);
-        mPhotoRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        mPhotoRecyclerView.setLayoutManager(new GridLayoutManager(getActivity(), 2)); // 2 = columns (set using method later)
 
         updateUI();
 
@@ -68,31 +65,42 @@ public class MainFragment extends Fragment {
         }
     }
 
-    private class PhotoHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+    private class PhotoHolder extends RecyclerView.ViewHolder implements View.OnLongClickListener, View.OnClickListener {
         private Photo mPhoto;
 
         private ImageView mImageView;
 
         public PhotoHolder(View itemView) {
             super(itemView);
-            itemView.setOnClickListener(this);
+            itemView.setOnLongClickListener(this);
 
-            // TODO figure out initial photo holder state
-//            mImageView = (ImageView) itemView.findViewById(R.id.null_image_view);
-//          mTitleTextView = (TextView) itemView.findViewById(R.id.list_item_crime_title_text_view);
+            mImageView = (ImageView) itemView.findViewById(R.id.grid_item_photo_image_view);
         }
 
-        public void bindPhoto(Photo photo) {
+        public void bindImage(Photo photo) {
             mPhoto = photo;
 
-            // TODO implement image loader
-            //mImageView = load image mPhoto.getImageUri(4); // 4 = 500px
+            ImageLoader imageLoader = ImageLoader.getInstance();
+            DisplayImageOptions options = new DisplayImageOptions.Builder().cacheInMemory(true)
+                    .cacheOnDisc(true).resetViewBeforeLoading(true)
+                    .build();
+
+            String mUri = mPhoto.getImageUri(4); // 4 for 500px - get from config
+
+            imageLoader.displayImage(mUri, mImageView, options);
+
         }
 
         @Override
         public void onClick(View v) {
+            // fetch more images
+        }
+
+        @Override
+        public boolean onLongClick(View v) {
             Intent intent = PhotoActivity.newIntent(getActivity(), mPhoto.getId());
             startActivityForResult(intent, REQUEST_PHOTO);
+            return true;
         }
     }
 
@@ -108,10 +116,11 @@ public class MainFragment extends Fragment {
             View view = layoutInflater.inflate(R.layout.grid_item_photo, parent, false);
             return new PhotoHolder(view);
         }
+
         @Override
         public void onBindViewHolder(PhotoHolder holder, int position) {
             Photo photo = mPhotos.get(position);
-            holder.bindPhoto(photo);
+            holder.bindImage(photo);
         }
         @Override
         public int getItemCount() {
@@ -228,59 +237,6 @@ public class MainFragment extends Fragment {
 //    }
 //
 //    public class ImageAdapter implements ListAdapter {
-//        private Context imageContext;
-//
-//        public ImageAdapter(Context c) {
-//            imageContext = c;
-//        }
-//
-//        public int getCount() {
-//            return photosList.size();
-//        }
-//
-//        public Object getItem(int position) {
-//            return null;
-//        }
-//
-//        public long getItemId(int position) {
-//            return 0;
-//        }
-//
-//        public boolean hasStableIds() {
-//            return false;
-//        }
-//
-//        public boolean isEnabled(int position) {
-//            return true;
-//        }
-//
-//        public boolean areAllItemsEnabled() {
-//            return true;
-//        }
-//
-//        public boolean isEmpty() {
-//            if(photosList.size() == 0) {
-//                return true;
-//            } else {
-//                return false;
-//            }
-//        }
-//
-//        public int getItemViewType(int position) {
-//            return 0;
-//        }
-//
-//        public int getViewTypeCount() {
-//            return 1;
-//        }
-//
-//        public void registerDataSetObserver(DataSetObserver observer) {
-//            //
-//        }
-//
-//        public void unregisterDataSetObserver(DataSetObserver observer) {
-//            //
-//        }
 //
 //        // create a new ImageView for each item referenced by the Adapter
 //        public View getView(int position, View convertView, ViewGroup parent) {
