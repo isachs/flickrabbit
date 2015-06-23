@@ -27,7 +27,7 @@ public class MainActivity extends ActionBarActivity {
 
     final List<Integer> imagesList = new ArrayList<Integer>();
 
-    int count = 3;
+    int count = 1;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -200,7 +200,7 @@ public class MainActivity extends ActionBarActivity {
                 imageView = new ImageView(imageContext);
                 int cellSize = getColumnWidth();
                 imageView.setLayoutParams(new GridView.LayoutParams(cellSize, cellSize));
-                imageView.setScaleType(ImageView.ScaleType.FIT_CENTER);
+                imageView.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
                 imageView.setPadding(0, 0, 0, 0);
             } else {
                 imageView = (ImageView) convertView;
