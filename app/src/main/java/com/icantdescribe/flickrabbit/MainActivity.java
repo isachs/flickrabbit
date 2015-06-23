@@ -19,8 +19,12 @@ import android.widget.ImageView;
 import android.widget.ListAdapter;
 import android.widget.Toast;
 
+import com.nostra13.universalimageloader.cache.memory.impl.WeakMemoryCache;
+import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
+import com.nostra13.universalimageloader.core.assist.ImageScaleType;
+import com.nostra13.universalimageloader.core.display.FadeInBitmapDisplayer;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -36,7 +40,16 @@ public class MainActivity extends ActionBarActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(this).build();
+        DisplayImageOptions defaultOptions = new DisplayImageOptions.Builder()
+                .cacheOnDisc(true).cacheInMemory(true)
+                .imageScaleType(ImageScaleType.EXACTLY).build();
+
+        ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(
+                getApplicationContext())
+                .defaultDisplayImageOptions(defaultOptions)
+                .memoryCache(new WeakMemoryCache())
+                .discCacheSize(100 * 1024 * 1024).build();
+
         ImageLoader.getInstance().init(config);
 
         setContentView(R.layout.activity_main);
@@ -211,15 +224,17 @@ public class MainActivity extends ActionBarActivity {
                 imageView = new ImageView(imageContext);
                 int cellSize = getColumnWidth();
                 imageView.setLayoutParams(new GridView.LayoutParams(cellSize, cellSize));
-                imageView.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
                 imageView.setPadding(10, 10, 10, 10);
             } else {
                 imageView = (ImageView) convertView;
             }
 
             ImageLoader imageLoader = ImageLoader.getInstance();
-            Bitmap bm = imageLoader.loadImageSync("http://farm1.staticflickr.com/271/18884532229_f499655622.jpg");
-            imageView.setImageBitmap(bm);
+            DisplayImageOptions options = new DisplayImageOptions.Builder().cacheInMemory(true)
+                    .cacheOnDisc(true).resetViewBeforeLoading(true)
+                    .build();
+
+            imageLoader.displayImage("http://farm1.staticflickr.com/271/18884532229_f499655622.jpg", imageView, options);
 
             return imageView;
         }
