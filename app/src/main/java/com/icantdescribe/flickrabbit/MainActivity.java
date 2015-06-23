@@ -4,7 +4,7 @@ import android.content.Context;
 import android.content.res.Configuration;
 import android.database.DataSetObserver;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
+import android.os.StrictMode;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
@@ -19,6 +19,9 @@ import android.widget.ImageView;
 import android.widget.ListAdapter;
 import android.widget.Toast;
 
+import com.nostra13.universalimageloader.core.ImageLoader;
+import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
+
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
@@ -32,7 +35,15 @@ public class MainActivity extends ActionBarActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(this).build();
+        ImageLoader.getInstance().init(config);
+
         setContentView(R.layout.activity_main);
+
+        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+        StrictMode.setThreadPolicy(policy);
+
         Context context = this;
         final ListAdapter adapter = new ImageAdapter(context);
 
@@ -75,7 +86,7 @@ public class MainActivity extends ActionBarActivity {
     }
 
     public int getColumnWidth() {
-        return 500;
+        return 525;
     }
 
     public int getNumColumns() {
@@ -201,14 +212,14 @@ public class MainActivity extends ActionBarActivity {
                 int cellSize = getColumnWidth();
                 imageView.setLayoutParams(new GridView.LayoutParams(cellSize, cellSize));
                 imageView.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
-                imageView.setPadding(0, 0, 0, 0);
+                imageView.setPadding(10, 10, 10, 10);
             } else {
                 imageView = (ImageView) convertView;
             }
 
-            Bitmap bm = BitmapFactory.decodeResource(getResources(), getArrayFromIntList(imagesList)[position]);
+            ImageLoader imageLoader = ImageLoader.getInstance();
+            Bitmap bm = imageLoader.loadImageSync("http://farm1.staticflickr.com/271/18884532229_f499655622.jpg");
             imageView.setImageBitmap(bm);
-
 
             return imageView;
         }
