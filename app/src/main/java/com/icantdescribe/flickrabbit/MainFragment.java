@@ -10,7 +10,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
-import com.nostra13.universalimageloader.cache.memory.impl.WeakMemoryCache;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
@@ -33,8 +32,7 @@ public class MainFragment extends Fragment {
 
         ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(getActivity())
                 .defaultDisplayImageOptions(defaultOptions)
-                .memoryCache(new WeakMemoryCache())
-                .discCacheSize(100 * 1024 * 1024).build();
+                .discCacheSize(100 * 1024 * 1024).build(); // get from prefs later
 
         ImageLoader.getInstance().init(config);
 
@@ -127,5 +125,5 @@ public class MainFragment extends Fragment {
             return mPhotos.size();
         }
     }
-    
+
 }
