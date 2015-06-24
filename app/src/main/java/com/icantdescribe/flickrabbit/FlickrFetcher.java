@@ -64,7 +64,7 @@ public class FlickrFetcher {
             String jsonString = getUrlString(url);
             Log.i(TAG, "Received JSON: " + jsonString);
             JSONObject jsonBody = new JSONObject(jsonString);
-            parseItems(items, jsonBody);
+            items = parseItems(items, jsonBody);
         } catch (JSONException je) {
             Log.e(TAG, "Failed to parse JSON", je);
         } catch (IOException ioe) {
@@ -74,7 +74,7 @@ public class FlickrFetcher {
         return items;
     }
 
-    private void parseItems(List<Photo> items, JSONObject jsonBody) throws IOException, JSONException {
+    private List<Photo> parseItems(List<Photo> items, JSONObject jsonBody) throws IOException, JSONException {
 
         JSONObject photosJsonObject = jsonBody.getJSONObject("photos");
         JSONArray photoJsonArray = photosJsonObject.getJSONArray("photo");
@@ -91,6 +91,7 @@ public class FlickrFetcher {
             items.add(photo);
         }
 
+        return items;
     }
 
     public ArrayList<Integer> randomIndices(int len, int num) {
