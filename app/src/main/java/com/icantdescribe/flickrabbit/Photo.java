@@ -2,14 +2,14 @@ package com.icantdescribe.flickrabbit;
 
 public class Photo {
 
-    private long mId;
+    private String mId;
     private String mOwner;
     private String mSecret;
-    private int mServer;
-    private int mFarm;
+    private String mServer;
+    private String mFarm;
     private final String[] mSizes = new String[]{"_t", "_m", "_n", "", "_z", "_c", "_b"};
 
-    public Photo(long id, String owner, String secret, int server, int farm) {
+    public Photo(String id, String owner, String secret, String server, String farm) {
         mId = id;
         mOwner = owner;
         mSecret = secret;
@@ -18,15 +18,19 @@ public class Photo {
     }
 
     public String getImageUri(int size) {
-        return "http://farm" + Integer.toString(mFarm) + ".staticflickr.com/" + mServer + "/" + Long.toString(mId) + "_" + mSecret + mSizes[size] + ".jpg";
+        return "http://farm" + mFarm + ".staticflickr.com/" + mServer + "/" + mId + "_" + mSecret + mSizes[size] + ".jpg";
     }
 
     public String getPhotoPageUri() {
-        return "http://www.flickr.com/photos/" + mOwner + "/" + Long.toString(mId);
+        return "http://www.flickr.com/photos/" + mOwner + "/" + mId;
     }
 
-    public long getId() {
+    public String getId() {
         return mId;
+    }
+
+    public String getOwner() {
+        return mOwner;
     }
 
 }

@@ -2,7 +2,9 @@ package com.icantdescribe.flickrabbit;
 
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.StrictMode;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -47,6 +49,9 @@ public class MainFragment extends Fragment {
         mPhotoRecyclerView.addItemDecoration(new GridInsetDecoration(getActivity()));
         mPhotoRecyclerView.setLayoutManager(new GridLayoutManager(getActivity(), getNumColumns()));
 
+        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+        StrictMode.setThreadPolicy(policy);
+
         updateUI();
 
         return view;
@@ -76,6 +81,8 @@ public class MainFragment extends Fragment {
         } else {
             mAdapter.notifyDataSetChanged();
         }
+
+        Log.i(TAG, "updateUI " + Integer.toString(photos.size()));
     }
 
     private class PhotoHolder extends RecyclerView.ViewHolder implements View.OnLongClickListener, View.OnClickListener {
@@ -85,6 +92,7 @@ public class MainFragment extends Fragment {
 
         public PhotoHolder(View itemView) {
             super(itemView);
+            itemView.setOnClickListener(this);
             itemView.setOnLongClickListener(this);
 
             mImageView = (ImageView) itemView.findViewById(R.id.grid_item_photo_image_view);
@@ -98,7 +106,7 @@ public class MainFragment extends Fragment {
                     .cacheOnDisc(true).resetViewBeforeLoading(true)
                     .build();
 
-            String mUri = mPhoto.getImageUri(4); // 4 for 500px - get from config
+            String mUri = mPhoto.getImageUri(3); // 3 for 500px - get from config in future
 
             imageLoader.displayImage(mUri, mImageView, options);
 
@@ -106,7 +114,15 @@ public class MainFragment extends Fragment {
 
         @Override
         public void onClick(View v) {
-            // fetch more images
+            PhotoGallery photoTool = PhotoGallery.get(getActivity());
+
+            FlickrFetcher fetcher = new FlickrFetcher();
+            List<Photo> newList = fetcher.fetchItems(mPhoto.getOwner());
+            for (int i = 0; i < newList.size(); i++) {
+                photoTool.addPhoto(newList.get(i));
+            }
+
+            updateUI();
         }
 
         @Override
@@ -144,6 +160,22 @@ public class MainFragment extends Fragment {
     public int getNumColumns() {
         final DisplayMetrics displayMetrics=getResources().getDisplayMetrics();
         return (int) Math.floor(displayMetrics.widthPixels / 520);
+    }
+
+    private class FetchItemsTask extends AsyncTask<Void,Void,Void> {
+
+        private String mUser = new String();
+
+        public FetchItemsTask(String user) {
+            super();
+            mUser = user;
+        }
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            new FlickrFetcher().fetchItems(mUser);
+            return null;
+        }
     }
 
 }

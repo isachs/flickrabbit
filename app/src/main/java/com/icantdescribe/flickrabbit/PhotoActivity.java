@@ -9,9 +9,9 @@ import java.util.UUID;
 public class PhotoActivity extends SingleFragmentActivity {
 
     private static final String EXTRA_PHOTO_ID = "com.icantdescribe.flickrabbit";
-    public static Intent newIntent(Context packageContext, long photoId) {
+    public static Intent newIntent(Context packageContext, String photoId) {
         Intent intent = new Intent(packageContext, PhotoActivity.class);
-        intent.putExtra(EXTRA_PHOTO_ID, photoId);
+        intent.putExtra(EXTRA_PHOTO_ID, Integer.parseInt(photoId));
         return intent;
     }
 
