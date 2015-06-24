@@ -34,7 +34,7 @@ public class FlickrFetcher {
                         urlSpec);
             }
             int bytesRead = 0;
-            byte[] buffer = new byte[1024];
+            byte[] buffer = new byte[2048];
             while ((bytesRead = in.read(buffer)) > 0) {
                 out.write(buffer, 0, bytesRead);
             }
@@ -101,7 +101,7 @@ public class FlickrFetcher {
             list.add(new Integer(i));
         }
         Collections.shuffle(list);
-        for (int i=0; i<(Math.min(len,num)); i++) {
+        for (int i=0; i<(Math.min(len,num-1)); i++) {
             outList.add(list.get(i));
         }
         return outList;
