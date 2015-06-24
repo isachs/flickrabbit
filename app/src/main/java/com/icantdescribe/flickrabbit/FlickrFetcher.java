@@ -74,6 +74,32 @@ public class FlickrFetcher {
         return items;
     }
 
+    public String fetchBiggestPhotoUri(String id) {
+
+        String uri = new String();
+
+        try {
+            String url = Uri.parse("https://api.flickr.com/services/rest/")
+                    .buildUpon()
+                    .appendQueryParameter("method", "flickr.photos.getSizes")
+                    .appendQueryParameter("api_key", API_KEY)
+                    .appendQueryParameter("photo_id", id)
+                    .appendQueryParameter("format", "json")
+                    .appendQueryParameter("nojsoncallback", "1")
+                    .build().toString();
+            String jsonString = getUrlString(url);
+            Log.i(TAG, "Received JSON: " + jsonString);
+            JSONObject jsonBody = new JSONObject(jsonString);
+            uri = parseSizes(uri, jsonBody);
+        } catch (JSONException je) {
+            Log.e(TAG, "Failed to parse JSON", je);
+        } catch (IOException ioe) {
+            Log.e(TAG, "Failed to fetch items", ioe);
+        }
+
+        return uri;
+    }
+
     private List<Photo> parseItems(List<Photo> items, JSONObject jsonBody) throws IOException, JSONException {
 
         JSONObject photosJsonObject = jsonBody.getJSONObject("photos");
@@ -92,6 +118,20 @@ public class FlickrFetcher {
         }
 
         return items;
+    }
+
+    private String parseSizes(String uri, JSONObject jsonBody) throws IOException, JSONException {
+
+        JSONObject sizesJsonObject = jsonBody.getJSONObject("sizes");
+        JSONArray sizeJsonArray = sizesJsonObject.getJSONArray("size");
+
+        JSONObject sizeJsonObject = sizeJsonArray.getJSONObject(sizeJsonArray.length() - 1);
+
+        String uriOut = sizeJsonObject.getString("source");
+
+        Log.d(TAG, uriOut);
+
+        return uriOut;
     }
 
     public ArrayList<Integer> randomIndices(int len, int num) {
