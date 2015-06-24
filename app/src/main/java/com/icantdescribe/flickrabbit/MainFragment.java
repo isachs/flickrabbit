@@ -118,6 +118,8 @@ public class MainFragment extends Fragment {
 
             FlickrFetcher fetcher = new FlickrFetcher();
             List<Photo> newList = fetcher.fetchItems(mPhoto.getOwner());
+
+            Log.d(TAG, "onClick " + Integer.toString(newList.size()));
             for (int i = 0; i < newList.size(); i++) {
                 photoTool.addPhoto(newList.get(i));
             }

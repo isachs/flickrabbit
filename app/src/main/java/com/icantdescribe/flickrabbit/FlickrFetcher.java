@@ -103,15 +103,6 @@ public class FlickrFetcher {
         for (int i=0; i<(Math.min(len,num)); i++) {
             outList.add(list.get(i));
         }
-
-        String listString = new String();
-        for (int s : list)
-        {
-            listString += Integer.toString(s) + "\t";
-        }
-
-        Log.d(TAG, "randomIndices " + listString);
-        
         return outList;
     }
 }
