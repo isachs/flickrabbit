@@ -46,9 +46,12 @@ public class MainFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_photo_grid, container, false);
         mPhotoRecyclerView = (RecyclerView) view.findViewById(R.id.photo_recycler_view);
 
-        mPhotoRecyclerView.addItemDecoration(new SpacesItemDecoration(10));
+        mPhotoRecyclerView.addItemDecoration(new SpacesItemDecoration(5));
 
-        mPhotoRecyclerView.setLayoutManager(new StaggeredGridLayoutManager(getNumColumns(), StaggeredGridLayoutManager.VERTICAL));
+        StaggeredGridLayoutManager lm = new StaggeredGridLayoutManager(getNumColumns(), StaggeredGridLayoutManager.VERTICAL);
+        lm.setGapStrategy(StaggeredGridLayoutManager.GAP_HANDLING_NONE);
+
+        mPhotoRecyclerView.setLayoutManager(lm);
 
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
@@ -61,7 +64,9 @@ public class MainFragment extends Fragment {
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
 
-        mPhotoRecyclerView.setLayoutManager(new StaggeredGridLayoutManager(getNumColumns(), StaggeredGridLayoutManager.VERTICAL));
+        StaggeredGridLayoutManager lm = new StaggeredGridLayoutManager(getNumColumns(), StaggeredGridLayoutManager.VERTICAL);
+
+        mPhotoRecyclerView.setLayoutManager(lm);
 
         updateUI();
     }
@@ -107,7 +112,7 @@ public class MainFragment extends Fragment {
                     .cacheOnDisc(true).resetViewBeforeLoading(true)
                     .build();
 
-            String mUri = mPhoto.getImageUri(3); // 3 for 500px - get from config in future
+            String mUri = mPhoto.getImageUri(4); // 4 for 500px - get from config in future
 
             imageLoader.displayImage(mUri, mImageView, options);
 
