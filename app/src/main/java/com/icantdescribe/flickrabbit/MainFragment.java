@@ -123,6 +123,9 @@ public class MainFragment extends Fragment {
             }
 
             updateUI();
+
+            mPhotoRecyclerView.smoothScrollToPosition(0);
+            mPhotoRecyclerView.smoothScrollToPosition(photoTool.getNumPhotos());
         }
 
         @Override

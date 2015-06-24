@@ -24,6 +24,10 @@ public class PhotoGallery {
         return mPhotos;
     }
 
+    public int getNumPhotos() {
+        return mPhotos.size();
+    }
+
     public Photo getPhoto(String id) {
         for (Photo photo : mPhotos) {
             if (photo.getId() == id) {
