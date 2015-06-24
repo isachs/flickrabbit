@@ -79,7 +79,7 @@ public class FlickrFetcher {
         JSONObject photosJsonObject = jsonBody.getJSONObject("photos");
         JSONArray photoJsonArray = photosJsonObject.getJSONArray("photo");
 
-        ArrayList<Integer> rand = randomIndices(10); // 10 items for now - from prefs later
+        ArrayList<Integer> rand = randomIndices(10, photoJsonArray.length()); // 10 items for now - from prefs later
 
         for (int i = 0; i < rand.size(); i++) {
             JSONObject photoJsonObject = photoJsonArray.getJSONObject(rand.get(i));
@@ -93,17 +93,25 @@ public class FlickrFetcher {
 
     }
 
-    public ArrayList<Integer> randomIndices(int num) {
+    public ArrayList<Integer> randomIndices(int len, int num) {
         ArrayList<Integer> list = new ArrayList<Integer>();
         ArrayList<Integer> outList = new ArrayList<Integer>();
-        for (int i=1; i<101; i++) { // for 100 images returned
+        for (int i=1; i<num; i++) { // for 100 images returned
             list.add(new Integer(i));
         }
         Collections.shuffle(list);
-        for (int i=0; i<num; i++) {
+        for (int i=0; i<(Math.min(len,num)); i++) {
             outList.add(list.get(i));
         }
 
+        String listString = new String();
+        for (int s : list)
+        {
+            listString += Integer.toString(s) + "\t";
+        }
+
+        Log.d(TAG, "randomIndices " + listString);
+        
         return outList;
     }
 }
