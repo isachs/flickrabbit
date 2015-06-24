@@ -6,7 +6,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.support.v4.app.Fragment;
-import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -46,8 +46,9 @@ public class MainFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_photo_grid, container, false);
         mPhotoRecyclerView = (RecyclerView) view.findViewById(R.id.photo_recycler_view);
 
-        mPhotoRecyclerView.addItemDecoration(new GridInsetDecoration(getActivity()));
-        mPhotoRecyclerView.setLayoutManager(new GridLayoutManager(getActivity(), getNumColumns()));
+        mPhotoRecyclerView.addItemDecoration(new SpacesItemDecoration(10));
+
+        mPhotoRecyclerView.setLayoutManager(new StaggeredGridLayoutManager(getNumColumns(), StaggeredGridLayoutManager.VERTICAL));
 
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
@@ -60,7 +61,7 @@ public class MainFragment extends Fragment {
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
 
-        mPhotoRecyclerView.setLayoutManager(new GridLayoutManager(getActivity(), getNumColumns()));
+        mPhotoRecyclerView.setLayoutManager(new StaggeredGridLayoutManager(getNumColumns(), StaggeredGridLayoutManager.VERTICAL));
 
         updateUI();
     }
