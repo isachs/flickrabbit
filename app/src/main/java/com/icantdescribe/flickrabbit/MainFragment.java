@@ -127,8 +127,9 @@ public class MainFragment extends Fragment {
 
         @Override
         public boolean onLongClick(View v) {
-            Intent intent = PhotoActivity.newIntent(getActivity(), mPhoto.getId());
-            startActivityForResult(intent, REQUEST_PHOTO);
+            // disable long click for now
+//            Intent intent = PhotoActivity.newIntent(getActivity(), mPhoto.getId());
+//            startActivityForResult(intent, REQUEST_PHOTO);
             return true;
         }
     }
