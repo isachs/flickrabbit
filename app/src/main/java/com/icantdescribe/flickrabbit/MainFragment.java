@@ -52,6 +52,14 @@ public class MainFragment extends Fragment {
         return view;
     }
 
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+
+        mPhotoRecyclerView.setLayoutManager(new GridLayoutManager(getActivity(), getNumColumns()));
+
+        updateUI();
+    }
+
     @Override
     public void onResume() {
         super.onResume();
