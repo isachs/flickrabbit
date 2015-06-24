@@ -1,10 +1,13 @@
 package com.icantdescribe.flickrabbit;
 
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,6 +22,8 @@ import java.util.List;
 
 public class MainFragment extends Fragment {
 
+    private static final String TAG = "FlickRabbit";
+
     private static final int REQUEST_PHOTO = 1;
 
     private RecyclerView mPhotoRecyclerView;
@@ -28,7 +33,7 @@ public class MainFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         DisplayImageOptions defaultOptions = new DisplayImageOptions.Builder()
                 .cacheOnDisc(true).cacheInMemory(true)
-                .imageScaleType(ImageScaleType.EXACTLY).build();
+                .imageScaleType(ImageScaleType.EXACTLY_STRETCHED).build();
 
         ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(getActivity())
                 .defaultDisplayImageOptions(defaultOptions)
@@ -38,7 +43,9 @@ public class MainFragment extends Fragment {
 
         View view = inflater.inflate(R.layout.fragment_photo_grid, container, false);
         mPhotoRecyclerView = (RecyclerView) view.findViewById(R.id.photo_recycler_view);
-        mPhotoRecyclerView.setLayoutManager(new GridLayoutManager(getActivity(), 2)); // 2 = columns (set using method later)
+
+        mPhotoRecyclerView.addItemDecoration(new GridInsetDecoration(getActivity()));
+        mPhotoRecyclerView.setLayoutManager(new GridLayoutManager(getActivity(), getNumColumns()));
 
         updateUI();
 
@@ -124,6 +131,11 @@ public class MainFragment extends Fragment {
         public int getItemCount() {
             return mPhotos.size();
         }
+    }
+
+    public int getNumColumns() {
+        final DisplayMetrics displayMetrics=getResources().getDisplayMetrics();
+        return (int) Math.floor(displayMetrics.widthPixels / 520);
     }
 
 }
