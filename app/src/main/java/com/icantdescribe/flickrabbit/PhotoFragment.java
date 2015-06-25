@@ -53,6 +53,16 @@ public class PhotoFragment extends Fragment {
             }
         });
 
+        mImageView.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v) {
+                String uri = new FlickrFetcher().fetchPhotoPageUri(mPhotoId);
+
+                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(uri));
+                startActivity(browserIntent);
+            }
+        });
+
         DisplayImageOptions defaultOptions = new DisplayImageOptions.Builder()
                 .cacheOnDisc(true).cacheInMemory(true)
                 .imageScaleType(ImageScaleType.EXACTLY_STRETCHED).build();
