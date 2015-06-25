@@ -2,7 +2,7 @@ package com.icantdescribe.flickrabbit;
 
 import android.content.Context;
 import android.content.Intent;
-import android.support.v4.app.Fragment;
+import android.app.Fragment;
 
 public class PhotoActivity extends SingleFragmentActivity {
 

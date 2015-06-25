@@ -1,7 +1,6 @@
 package com.icantdescribe.flickrabbit;
 
-
-import android.support.v4.app.Fragment;
+import android.app.Fragment;
 
 public class MainActivity extends SingleFragmentActivity {
 

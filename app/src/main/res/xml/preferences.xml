@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <EditTextPreference
+        android:key="pref_userid"
+        android:title="@string/pref_userid"
+        android:summary="@string/pref_userid_summ"
+        android:defaultValue="40786724@N00" />
+</PreferenceScreen>

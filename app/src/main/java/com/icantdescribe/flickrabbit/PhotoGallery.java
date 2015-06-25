@@ -2,7 +2,6 @@ package com.icantdescribe.flickrabbit;
 
 import android.content.Context;
 
-import java.util.ArrayList;
 import java.util.List;
 
 // Singleton to hold our photos

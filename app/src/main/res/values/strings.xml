@@ -2,7 +2,10 @@
 <resources>
 
     <string name="app_name">FlickRabbit</string>
-    <string name="hello_world">Hello world!</string>
+
     <string name="action_settings">Settings</string>
+
+    <string name="pref_userid">User ID</string>
+    <string name="pref_userid_summ">Put your Flickr ID number here.</string>
 
 </resources>
