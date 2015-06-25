@@ -21,6 +21,9 @@ public class FlickrFetcher {
     private static final String TAG = "FlickrFetcher";
 
     private static final String API_KEY = "9b19a5f825a6e38ac4d17da55c9ee07a";
+    private static final String ENDPOINT = "https://api.flickr.com/services/rest/";
+    private static final String METHOD_FAVES = "flickr.favorites.getList";
+    private static final String METHOD_SIZES = "flickr.photos.getSizes";
 
     public byte[] getUrlBytes(String urlSpec) throws IOException {
         URL url = new URL(urlSpec);
@@ -53,9 +56,9 @@ public class FlickrFetcher {
         List<Photo> items = new ArrayList<>();
 
         try {
-            String url = Uri.parse("https://api.flickr.com/services/rest/")
+            String url = Uri.parse(ENDPOINT)
                     .buildUpon()
-                    .appendQueryParameter("method", "flickr.favorites.getList")
+                    .appendQueryParameter("method", METHOD_FAVES)
                     .appendQueryParameter("api_key", API_KEY)
                     .appendQueryParameter("user_id", user)
                     .appendQueryParameter("format", "json")
@@ -79,9 +82,9 @@ public class FlickrFetcher {
         String uri = new String();
 
         try {
-            String url = Uri.parse("https://api.flickr.com/services/rest/")
+            String url = Uri.parse(ENDPOINT)
                     .buildUpon()
-                    .appendQueryParameter("method", "flickr.photos.getSizes")
+                    .appendQueryParameter("method", METHOD_SIZES)
                     .appendQueryParameter("api_key", API_KEY)
                     .appendQueryParameter("photo_id", id)
                     .appendQueryParameter("format", "json")
