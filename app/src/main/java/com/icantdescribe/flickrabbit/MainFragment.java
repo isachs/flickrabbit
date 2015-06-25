@@ -34,12 +34,12 @@ public class MainFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         DisplayImageOptions defaultOptions = new DisplayImageOptions.Builder()
-                .cacheOnDisc(true).cacheInMemory(true)
+                .cacheOnDisk(true).cacheInMemory(true)
                 .imageScaleType(ImageScaleType.EXACTLY_STRETCHED).build();
 
         ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(getActivity())
                 .defaultDisplayImageOptions(defaultOptions)
-                .discCacheSize(100 * 1024 * 1024).build(); // get from prefs later
+                .diskCacheSize(100 * 1024 * 1024).build(); // get from prefs later
 
         ImageLoader.getInstance().init(config);
 
@@ -172,6 +172,12 @@ public class MainFragment extends Fragment {
         }
 
         @Override
+        protected void onPreExecute() {
+            View pb = getActivity().findViewById(R.id.progress_bar);
+            pb.setVisibility(View.VISIBLE);
+        }
+
+        @Override
         protected List<Photo> doInBackground(String... params) {
             List<Photo> photos = new FlickrFetcher().fetchItems(mUser);
             return photos;
@@ -189,8 +195,14 @@ public class MainFragment extends Fragment {
 
             updateUI();
 
+            View pb = getActivity().findViewById(R.id.progress_bar);
+
             mPhotoRecyclerView.smoothScrollToPosition(0);
             mPhotoRecyclerView.smoothScrollToPosition(photoTool.getNumPhotos());
+
+            Log.d(TAG, "smoothScroll " + Integer.toString(photoTool.getNumPhotos()));
+
+            pb.setVisibility(View.GONE);
         }
     }
 
