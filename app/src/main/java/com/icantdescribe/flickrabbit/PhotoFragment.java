@@ -1,6 +1,8 @@
 package com.icantdescribe.flickrabbit;
 
 import android.app.Activity;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -40,6 +42,17 @@ public class PhotoFragment extends Fragment {
 
         mImageView = (ImageView) v.findViewById(R.id.full_photo_view);
 
+        mImageView.setOnLongClickListener(new View.OnLongClickListener(){
+            @Override
+            public boolean onLongClick(View v) {
+                String uri = new FlickrFetcher().fetchPhotoPageUri(mPhotoId);
+
+                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(uri));
+                startActivity(browserIntent);
+                return true;
+            }
+        });
+
         DisplayImageOptions defaultOptions = new DisplayImageOptions.Builder()
                 .cacheOnDisc(true).cacheInMemory(true)
                 .imageScaleType(ImageScaleType.EXACTLY_STRETCHED).build();
@@ -56,7 +69,7 @@ public class PhotoFragment extends Fragment {
                 .build();
 
         FlickrFetcher flickrFetcher = new FlickrFetcher();
-        String mUri = flickrFetcher.fetchBiggestPhotoUri(mPhotoId); // 4 for 500px - get from config in future
+        String mUri = flickrFetcher.fetchBiggestPhotoUri(mPhotoId);
 
         imageLoader.displayImage(mUri, mImageView, options);
 
@@ -66,4 +79,5 @@ public class PhotoFragment extends Fragment {
     public void returnResult() {
         getActivity().setResult(Activity.RESULT_OK, null);
     }
+
 }

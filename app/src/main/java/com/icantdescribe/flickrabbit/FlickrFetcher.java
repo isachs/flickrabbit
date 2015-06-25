@@ -24,6 +24,7 @@ public class FlickrFetcher {
     private static final String ENDPOINT = "https://api.flickr.com/services/rest/";
     private static final String METHOD_FAVES = "flickr.favorites.getList";
     private static final String METHOD_SIZES = "flickr.photos.getSizes";
+    private static final String METHOD_INFO = "flickr.photos.getInfo";
 
     public byte[] getUrlBytes(String urlSpec) throws IOException {
         URL url = new URL(urlSpec);
@@ -103,6 +104,32 @@ public class FlickrFetcher {
         return uri;
     }
 
+    public String fetchPhotoPageUri(String id) {
+
+        String uri = new String();
+
+        try {
+            String url = Uri.parse(ENDPOINT)
+                    .buildUpon()
+                    .appendQueryParameter("method", METHOD_INFO)
+                    .appendQueryParameter("api_key", API_KEY)
+                    .appendQueryParameter("photo_id", id)
+                    .appendQueryParameter("format", "json")
+                    .appendQueryParameter("nojsoncallback", "1")
+                    .build().toString();
+            String jsonString = getUrlString(url);
+            Log.i(TAG, "Received JSON: " + jsonString);
+            JSONObject jsonBody = new JSONObject(jsonString);
+            uri = parsePhotoPageUri(uri, jsonBody);
+        } catch (JSONException je) {
+            Log.e(TAG, "Failed to parse JSON", je);
+        } catch (IOException ioe) {
+            Log.e(TAG, "Failed to fetch items", ioe);
+        }
+
+        return uri;
+    }
+
     private List<Photo> parseItems(List<Photo> items, JSONObject jsonBody) throws IOException, JSONException {
 
         JSONObject photosJsonObject = jsonBody.getJSONObject("photos");
@@ -132,7 +159,19 @@ public class FlickrFetcher {
 
         String uriOut = sizeJsonObject.getString("source");
 
-        Log.d(TAG, uriOut);
+        Log.d(TAG, "parseSizes " + uriOut);
+
+        return uriOut;
+    }
+
+    private String parsePhotoPageUri(String uri, JSONObject jsonBody) throws IOException, JSONException {
+
+        JSONObject photoJsonObject = jsonBody.getJSONObject("photo");
+        JSONObject ownerJsonObject = photoJsonObject.getJSONObject("owner");
+
+        String uriOut = "https://www.flickr.com/photos/" + ownerJsonObject.getString("nsid") + "/" + photoJsonObject.getString("id") + "/";
+
+        Log.d(TAG, "parsePhotoPageUri " + uriOut);
 
         return uriOut;
     }
