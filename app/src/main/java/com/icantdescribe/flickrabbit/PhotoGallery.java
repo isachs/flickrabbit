@@ -1,6 +1,9 @@
 package com.icantdescribe.flickrabbit;
 
 import android.content.Context;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
+import android.util.Log;
 
 import java.util.List;
 
@@ -9,10 +12,15 @@ import java.util.List;
 public class PhotoGallery {
     private static PhotoGallery sPhotoGallery;
 
+    private final static String TAG = "Flickrabbit";
+
     private List<Photo> mPhotos;
 
     private PhotoGallery(Context context) {
-        mPhotos = new FlickrFetcher().fetchItems("40786724@N00"); // my user - get from prefs later
+        SharedPreferences shared = PreferenceManager.getDefaultSharedPreferences(context);
+        String user = shared.getString("pref_userid", "40786724@N00");
+        Log.d(TAG, "userid " + user);
+        mPhotos = new FlickrFetcher().fetchItems(user); // my user - get from prefs later
     }
 
     public void addPhoto(Photo photo) {
