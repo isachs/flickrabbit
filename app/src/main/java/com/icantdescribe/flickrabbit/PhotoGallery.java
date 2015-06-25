@@ -15,12 +15,17 @@ public class PhotoGallery {
     private final static String TAG = "Flickrabbit";
 
     private List<Photo> mPhotos;
+    private String mUser;
 
     private PhotoGallery(Context context) {
+        intializePhotos(context);
+    }
+
+    public void intializePhotos(Context context) {
         SharedPreferences shared = PreferenceManager.getDefaultSharedPreferences(context);
-        String user = shared.getString("pref_userid", "40786724@N00");
-        Log.d(TAG, "userid " + user);
-        mPhotos = new FlickrFetcher().fetchItems(user); // my user - get from prefs later
+        mUser = shared.getString("pref_userid", "40786724@N00");
+        Log.d(TAG, "userid " + mUser);
+        mPhotos = new FlickrFetcher().fetchItems(mUser);
     }
 
     public void addPhoto(Photo photo) {

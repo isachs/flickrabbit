@@ -1,11 +1,14 @@
 package com.icantdescribe.flickrabbit;
 
+import android.app.DialogFragment;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.app.Fragment;
+import android.preference.PreferenceManager;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
@@ -78,6 +81,21 @@ public class MainFragment extends Fragment {
             case R.id.action_settings:
                 Intent intent = SettingsActivity.newIntent(getActivity(), null);
                 startActivityForResult(intent, REQUEST_PHOTO);
+                return true;
+            case R.id.action_help:
+                DialogFragment newFragment = new HelpFragment();
+                newFragment.show(getFragmentManager(), "help");
+                return true;
+            case R.id.action_refresh:
+                PhotoGallery photoTool = PhotoGallery.get(getActivity());
+                photoTool.intializePhotos(getActivity());
+                mAdapter = new PhotoAdapter(photoTool.getPhotos());
+                mPhotoRecyclerView.setAdapter(mAdapter);
+
+                StaggeredGridLayoutManager lm = new StaggeredGridLayoutManager(getNumColumns(), StaggeredGridLayoutManager.VERTICAL);
+                lm.setGapStrategy(StaggeredGridLayoutManager.GAP_HANDLING_NONE);
+
+                mPhotoRecyclerView.setLayoutManager(lm);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
