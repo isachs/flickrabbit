@@ -121,20 +121,7 @@ public class MainFragment extends Fragment {
 
         @Override
         public void onClick(View v) {
-            PhotoGallery photoTool = PhotoGallery.get(getActivity());
-
-            FlickrFetcher fetcher = new FlickrFetcher();
-            List<Photo> newList = fetcher.fetchItems(mPhoto.getOwner());
-
-            Log.d(TAG, "onClick " + Integer.toString(newList.size()));
-            for (int i = 0; i < newList.size(); i++) {
-                photoTool.addPhoto(newList.get(i));
-            }
-
-            updateUI();
-
-            mPhotoRecyclerView.smoothScrollToPosition(0);
-            mPhotoRecyclerView.smoothScrollToPosition(photoTool.getNumPhotos());
+            new FetchItemsTask(mPhoto.getOwner()).execute();
         }
 
         @Override
@@ -175,7 +162,7 @@ public class MainFragment extends Fragment {
         return (int) Math.floor(displayMetrics.widthPixels / 520);
     }
 
-    private class FetchItemsTask extends AsyncTask<Void,Void,Void> {
+    private class FetchItemsTask extends AsyncTask<String,Void,List<Photo>> {
 
         private String mUser = new String();
 
@@ -185,9 +172,25 @@ public class MainFragment extends Fragment {
         }
 
         @Override
-        protected Void doInBackground(Void... params) {
-            new FlickrFetcher().fetchItems(mUser);
-            return null;
+        protected List<Photo> doInBackground(String... params) {
+            List<Photo> photos = new FlickrFetcher().fetchItems(mUser);
+            return photos;
+        }
+
+        @Override
+        protected void onPostExecute(List<Photo> photos) {
+            PhotoGallery photoTool = PhotoGallery.get(getActivity());
+
+            Log.d(TAG, "onClick " + Integer.toString(photos.size()));
+
+            for (int i = 0; i < photos.size(); i++) {
+                photoTool.addPhoto(photos.get(i));
+            }
+
+            updateUI();
+
+            mPhotoRecyclerView.smoothScrollToPosition(0);
+            mPhotoRecyclerView.smoothScrollToPosition(photoTool.getNumPhotos());
         }
     }
 
