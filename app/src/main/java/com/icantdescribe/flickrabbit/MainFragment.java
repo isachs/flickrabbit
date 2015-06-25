@@ -65,6 +65,7 @@ public class MainFragment extends Fragment {
         super.onConfigurationChanged(newConfig);
 
         StaggeredGridLayoutManager lm = new StaggeredGridLayoutManager(getNumColumns(), StaggeredGridLayoutManager.VERTICAL);
+        lm.setGapStrategy(StaggeredGridLayoutManager.GAP_HANDLING_NONE);
 
         mPhotoRecyclerView.setLayoutManager(lm);
 
