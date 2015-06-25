@@ -61,6 +61,7 @@ public class MainFragment extends Fragment {
         return view;
     }
 
+    @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
 
