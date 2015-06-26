@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.os.StrictMode;
 import android.app.Fragment;
 import android.preference.PreferenceManager;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
@@ -36,6 +37,7 @@ public class MainFragment extends Fragment {
 
     private RecyclerView mPhotoRecyclerView;
     private PhotoAdapter mAdapter;
+    private String mGridType;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -54,10 +56,7 @@ public class MainFragment extends Fragment {
 
         mPhotoRecyclerView.addItemDecoration(new SpacesItemDecoration(5));
 
-        StaggeredGridLayoutManager lm = new StaggeredGridLayoutManager(getNumColumns(), StaggeredGridLayoutManager.VERTICAL);
-        lm.setGapStrategy(StaggeredGridLayoutManager.GAP_HANDLING_NONE);
-
-        mPhotoRecyclerView.setLayoutManager(lm);
+        setLayoutManager();
 
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
@@ -91,11 +90,7 @@ public class MainFragment extends Fragment {
                 photoTool.intializePhotos(getActivity());
                 mAdapter = new PhotoAdapter(photoTool.getPhotos());
                 mPhotoRecyclerView.setAdapter(mAdapter);
-
-                StaggeredGridLayoutManager lm = new StaggeredGridLayoutManager(getNumColumns(), StaggeredGridLayoutManager.VERTICAL);
-                lm.setGapStrategy(StaggeredGridLayoutManager.GAP_HANDLING_NONE);
-
-                mPhotoRecyclerView.setLayoutManager(lm);
+                setLayoutManager();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -107,10 +102,7 @@ public class MainFragment extends Fragment {
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
 
-        StaggeredGridLayoutManager lm = new StaggeredGridLayoutManager(getNumColumns(), StaggeredGridLayoutManager.VERTICAL);
-        lm.setGapStrategy(StaggeredGridLayoutManager.GAP_HANDLING_NONE);
-
-        mPhotoRecyclerView.setLayoutManager(lm);
+        setLayoutManager();
 
         updateUI();
     }
@@ -203,6 +195,25 @@ public class MainFragment extends Fragment {
     public int getNumColumns() {
         final DisplayMetrics displayMetrics=getResources().getDisplayMetrics();
         return (int) Math.floor(displayMetrics.widthPixels / 520);
+    }
+
+    private void setLayoutManager() {
+        SharedPreferences shared = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        mGridType = shared.getString("pref_grid_type", getString(R.string.pref_grid_type_auto));
+
+        if (mGridType.equals(getString(R.string.pref_grid_type_staggered))) {
+            StaggeredGridLayoutManager lm = new StaggeredGridLayoutManager(getNumColumns(), StaggeredGridLayoutManager.VERTICAL);
+            lm.setGapStrategy(StaggeredGridLayoutManager.GAP_HANDLING_NONE);
+            mPhotoRecyclerView.setLayoutManager(lm);
+        } else if (mGridType.equals(getString(R.string.pref_grid_type_regular))) {
+            GridLayoutManager lm = new GridLayoutManager(getActivity(), getNumColumns());
+            mPhotoRecyclerView.setLayoutManager(lm);
+        } else {
+            // TODO: implement screen/system detection
+            StaggeredGridLayoutManager lm = new StaggeredGridLayoutManager(getNumColumns(), StaggeredGridLayoutManager.VERTICAL);
+            lm.setGapStrategy(StaggeredGridLayoutManager.GAP_HANDLING_NONE);
+            mPhotoRecyclerView.setLayoutManager(lm);
+        }
     }
 
     private class FetchItemsTask extends AsyncTask<String,Void,List<Photo>> {
