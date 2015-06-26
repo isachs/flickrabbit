@@ -14,4 +14,15 @@
     <string name="pref_userid">Flickr User ID</string>
     <string name="pref_userid_summ">Put your Flickr ID number here.</string>
 
+    <string name="pref_long_click">Grid Long Click Behavior</string>
+    <string name="pref_long_click_summ">Choose what you want to have happen when long clicking a grid item.</string>
+    <string name="pref_long_click_flickr">FLICKR</string>
+    <string name="pref_long_click_photo_view">PHOTO_VIEW</string>
+
+    <string name="pref_grid_type">Grid Type</string>
+    <string name="pref_grid_type_summ">Choose what type of grid you\'d like to see.</string>
+    <string name="pref_grid_type_auto">AUTO</string>
+    <string name="pref_grid_type_staggered">STAGGERED</string>
+    <string name="pref_grid_type_regular">REGULAR</string>
+
 </resources>

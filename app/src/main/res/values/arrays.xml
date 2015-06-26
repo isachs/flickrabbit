@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="pref_long_click_entries">
+        <item>Open Larger Image View</item>
+        <item>Open Flickr</item>
+    </string-array>
+    <string-array name="pref_long_click_values">
+        <item>PHOTO_VIEW</item>
+        <item>FLICKR</item>
+    </string-array>
+
+    <string-array name="pref_grid_type_entries">
+        <item>Automatic</item>
+        <item>Staggered Grid</item>
+        <item>Regular Grid</item>
+    </string-array>
+    <string-array name="pref_grid_type_values">
+        <item>AUTO</item>
+        <item>STAGGERED</item>
+        <item>REGULAR</item>
+    </string-array>
+</resources>
