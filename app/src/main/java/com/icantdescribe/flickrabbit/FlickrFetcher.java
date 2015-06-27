@@ -26,6 +26,8 @@ public class FlickrFetcher {
     private static final String METHOD_SIZES = "flickr.photos.getSizes";
     private static final String METHOD_INFO = "flickr.photos.getInfo";
 
+    private static final int mFetchNum = 250;
+
     public byte[] getUrlBytes(String urlSpec) throws IOException {
         URL url = new URL(urlSpec);
         HttpURLConnection connection = (HttpURLConnection)url.openConnection();
@@ -62,11 +64,13 @@ public class FlickrFetcher {
                     .appendQueryParameter("method", METHOD_FAVES)
                     .appendQueryParameter("api_key", API_KEY)
                     .appendQueryParameter("user_id", user)
+                    .appendQueryParameter("per_page", Integer.toString(mFetchNum))
                     .appendQueryParameter("format", "json")
                     .appendQueryParameter("nojsoncallback", "1")
                     .build().toString();
             String jsonString = getUrlString(url);
             Log.i(TAG, "Received JSON: " + jsonString);
+            Log.i(TAG, "Received JSON length: " + Integer.toString(jsonString.length()));
             JSONObject jsonBody = new JSONObject(jsonString);
             items = parseItems(items, jsonBody);
         } catch (JSONException je) {
