@@ -4,6 +4,7 @@ import android.app.DialogFragment;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.StrictMode;
@@ -38,6 +39,7 @@ public class MainFragment extends Fragment {
     private RecyclerView mPhotoRecyclerView;
     private PhotoAdapter mAdapter;
     private String mGridType;
+    private String mLongPressAction;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -161,9 +163,18 @@ public class MainFragment extends Fragment {
 
         @Override
         public boolean onLongClick(View v) {
-            // disable long click for now
-            Intent intent = PhotoActivity.newIntent(getActivity(), mPhoto.getId());
-            startActivityForResult(intent, REQUEST_PHOTO);
+            SharedPreferences shared = PreferenceManager.getDefaultSharedPreferences(getActivity());
+            mLongPressAction = shared.getString("pref_long_click", getString(R.string.pref_long_click_photo_view));
+
+            if (mLongPressAction.equals(getString(R.string.pref_long_click_flickr))) {
+                String uri = new FlickrFetcher().fetchPhotoPageUri(mPhoto.getId());
+
+                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(uri));
+                startActivity(browserIntent);
+            } else {
+                Intent intent = PhotoActivity.newIntent(getActivity(), mPhoto.getId());
+                startActivityForResult(intent, REQUEST_PHOTO);
+            }
             return true;
         }
     }
