@@ -15,7 +15,6 @@ public class PhotoGallery {
     private final static String TAG = "Flickrabbit";
 
     private List<Photo> mPhotos;
-    private String mUser;
 
     private PhotoGallery(Context context) {
         intializePhotos(context);
@@ -23,9 +22,12 @@ public class PhotoGallery {
 
     public void intializePhotos(Context context) {
         SharedPreferences shared = PreferenceManager.getDefaultSharedPreferences(context);
-        mUser = shared.getString("pref_userid", "40786724@N00");
-        Log.d(TAG, "userid " + mUser);
-        mPhotos = new FlickrFetcher().fetchItems(mUser);
+        String user = shared.getString("pref_userid", "40786724@N00");
+        int num = Integer.parseInt(shared.getString("pref_grid_num", "10"));
+        int fetchPoolSize = Math.max(Integer.parseInt(shared.getString("pref_fetch_num", "250")), 500);
+
+        Log.d(TAG, "userid " + user);
+        mPhotos = new FlickrFetcher().fetchItems(user, num, fetchPoolSize);
     }
 
     public void addPhoto(Photo photo) {

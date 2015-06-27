@@ -1,6 +1,9 @@
 package com.icantdescribe.flickrabbit;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.net.Uri;
+import android.preference.PreferenceManager;
 import android.util.Log;
 
 import org.json.JSONArray;
@@ -26,7 +29,7 @@ public class FlickrFetcher {
     private static final String METHOD_SIZES = "flickr.photos.getSizes";
     private static final String METHOD_INFO = "flickr.photos.getInfo";
 
-    private static final int mFetchNum = 250;
+    private int mFetchNum = 250;
 
     public byte[] getUrlBytes(String urlSpec) throws IOException {
         URL url = new URL(urlSpec);
@@ -54,7 +57,7 @@ public class FlickrFetcher {
         return new String(getUrlBytes(urlSpec));
     }
 
-    public List<Photo> fetchItems(String user) {
+    public List<Photo> fetchItems(String user, int num, int fetchPoolSize) {
 
         List<Photo> items = new ArrayList<>();
 
@@ -64,7 +67,7 @@ public class FlickrFetcher {
                     .appendQueryParameter("method", METHOD_FAVES)
                     .appendQueryParameter("api_key", API_KEY)
                     .appendQueryParameter("user_id", user)
-                    .appendQueryParameter("per_page", Integer.toString(mFetchNum))
+                    .appendQueryParameter("per_page", String.valueOf(fetchPoolSize))
                     .appendQueryParameter("format", "json")
                     .appendQueryParameter("nojsoncallback", "1")
                     .build().toString();
@@ -72,7 +75,7 @@ public class FlickrFetcher {
             Log.i(TAG, "Received JSON: " + jsonString);
             Log.i(TAG, "Received JSON length: " + Integer.toString(jsonString.length()));
             JSONObject jsonBody = new JSONObject(jsonString);
-            items = parseItems(items, jsonBody);
+            items = parseItems(items, jsonBody, num);
         } catch (JSONException je) {
             Log.e(TAG, "Failed to parse JSON", je);
         } catch (IOException ioe) {
@@ -134,12 +137,12 @@ public class FlickrFetcher {
         return uri;
     }
 
-    private List<Photo> parseItems(List<Photo> items, JSONObject jsonBody) throws IOException, JSONException {
+    private List<Photo> parseItems(List<Photo> items, JSONObject jsonBody, int num) throws IOException, JSONException {
 
         JSONObject photosJsonObject = jsonBody.getJSONObject("photos");
         JSONArray photoJsonArray = photosJsonObject.getJSONArray("photo");
 
-        ArrayList<Integer> rand = randomIndices(10, photoJsonArray.length()); // 10 items for now - from prefs later
+        ArrayList<Integer> rand = randomIndices(num, photoJsonArray.length());
 
         for (int i = 0; i < rand.size(); i++) {
             JSONObject photoJsonObject = photoJsonArray.getJSONObject(rand.get(i));
@@ -183,7 +186,7 @@ public class FlickrFetcher {
     public ArrayList<Integer> randomIndices(int len, int num) {
         ArrayList<Integer> list = new ArrayList<Integer>();
         ArrayList<Integer> outList = new ArrayList<Integer>();
-        for (int i=1; i<num; i++) { // for 100 images returned
+        for (int i=1; i<num; i++) {
             list.add(new Integer(i));
         }
         Collections.shuffle(list);

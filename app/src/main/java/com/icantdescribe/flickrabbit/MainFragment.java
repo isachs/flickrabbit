@@ -244,7 +244,11 @@ public class MainFragment extends Fragment {
 
         @Override
         protected List<Photo> doInBackground(String... params) {
-            List<Photo> photos = new FlickrFetcher().fetchItems(mUser);
+            SharedPreferences shared = PreferenceManager.getDefaultSharedPreferences(getActivity());
+            int num = Integer.parseInt(shared.getString("pref_grid_num", "10"));
+            int fetchPoolSize = Math.max(Integer.parseInt(shared.getString("pref_fetch_num", "250")),500);
+
+            List<Photo> photos = new FlickrFetcher().fetchItems(mUser, num, fetchPoolSize);
             return photos;
         }
 
