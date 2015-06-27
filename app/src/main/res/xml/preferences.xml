@@ -12,18 +12,6 @@
         android:entries="@array/pref_grid_type_entries"
         android:entryValues="@array/pref_grid_type_values"
         android:defaultValue="@string/pref_grid_type_auto" />
-    <EditTextPreference
-        android:key="pref_grid_num"
-        android:inputType="number"
-        android:title="@string/pref_grid_num"
-        android:summary="@string/pref_grid_num_summ"
-        android:defaultValue="10" />
-    <EditTextPreference
-        android:key="pref_fetch_num"
-        android:inputType="number"
-        android:title="@string/pref_fetch_num"
-        android:summary="@string/pref_fetch_num_summ"
-        android:defaultValue="250" />
     <ListPreference
         android:key="pref_long_click"
         android:title="@string/pref_long_click"

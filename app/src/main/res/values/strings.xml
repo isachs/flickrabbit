@@ -25,10 +25,4 @@
     <string name="pref_grid_type_staggered">STAGGERED</string>
     <string name="pref_grid_type_regular">REGULAR</string>
 
-    <string name="pref_grid_num">New Grid Items Per Tap</string>
-    <string name="pref_grid_num_summ">Choose how many new grid items you\'d like to see at once when you tap a grid item.</string>
-
-    <string name="pref_fetch_num">Possible New Grid Items To Fetch</string>
-    <string name="pref_fetch_num_summ">Choose how many favorites you\'d like from which to choose the new grid items.</string>
-
 </resources>
