@@ -1,9 +1,11 @@
 package com.icantdescribe.flickrabbit;
 
 import android.app.DialogFragment;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
+import android.graphics.Point;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -15,12 +17,14 @@ import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.ImageView;
 
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
@@ -220,10 +224,24 @@ public class MainFragment extends Fragment {
             GridLayoutManager lm = new GridLayoutManager(getActivity(), getNumColumns());
             mPhotoRecyclerView.setLayoutManager(lm);
         } else {
-            // TODO: implement screen/system detection
-            StaggeredGridLayoutManager lm = new StaggeredGridLayoutManager(getNumColumns(), StaggeredGridLayoutManager.VERTICAL);
-            lm.setGapStrategy(StaggeredGridLayoutManager.GAP_HANDLING_NONE);
-            mPhotoRecyclerView.setLayoutManager(lm);
+            WindowManager wm = (WindowManager) getActivity().getSystemService(Context.WINDOW_SERVICE);
+            Display display = wm.getDefaultDisplay();
+            Point size = new Point();
+            display.getSize(size);
+
+            int currentapiVersion = android.os.Build.VERSION.SDK_INT;
+
+            Log.d(TAG, "size " + Integer.toString(size.x) + " x " + Integer.toString(size.y));
+            Log.d(TAG, "apiversion " + Integer.toString(currentapiVersion));
+
+            if ((currentapiVersion >= android.os.Build.VERSION_CODES.KITKAT) && (size.x >= 800)){ // need KitKat and a decently sized screen
+                StaggeredGridLayoutManager lm = new StaggeredGridLayoutManager(getNumColumns(), StaggeredGridLayoutManager.VERTICAL);
+                lm.setGapStrategy(StaggeredGridLayoutManager.GAP_HANDLING_NONE);
+                mPhotoRecyclerView.setLayoutManager(lm);
+            } else {
+                GridLayoutManager lm = new GridLayoutManager(getActivity(), getNumColumns());
+                mPhotoRecyclerView.setLayoutManager(lm);
+            }
         }
     }
 
