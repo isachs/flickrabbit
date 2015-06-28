@@ -19,4 +19,23 @@
         <item>STAGGERED</item>
         <item>REGULAR</item>
     </string-array>
+
+    <string-array name="pref_grid_image_size_entries">
+        <item>Automatic</item>
+        <item>100px</item>
+        <item>240px</item>
+        <item>320px</item>
+        <item>500px</item>
+        <item>640px</item>
+        <item>800px</item>
+    </string-array>
+    <string-array name="pref_grid_image_size_values">
+        <item>-1</item>
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+        <item>5</item>
+    </string-array>
 </resources>

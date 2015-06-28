@@ -32,4 +32,7 @@
     <string name="pref_fetch_num">Possible New Grid Items To Fetch</string>
     <string name="pref_fetch_num_summ">Choose how many favorites you\'d like from which to choose the new grid items. Maximum is 500.</string>
 
+    <string name="pref_grid_image_size">Grid Image Size</string>
+    <string name="pref_grid_image_size_summ">Choose how large you\'d like your grid images to be.</string>
+
 </resources>

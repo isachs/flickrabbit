@@ -1,11 +1,9 @@
 package com.icantdescribe.flickrabbit;
 
 import android.app.DialogFragment;
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
-import android.graphics.Point;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -17,14 +15,12 @@ import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
 import android.util.Log;
-import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowManager;
 import android.widget.ImageView;
 
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
@@ -43,7 +39,11 @@ public class MainFragment extends Fragment {
     private RecyclerView mPhotoRecyclerView;
     private PhotoAdapter mAdapter;
     private String mGridType;
+    private String mActualGridType = "STAGGERED";
     private String mLongPressAction;
+
+    private final int[] mSizes = new int[]{100, 240, 320, 500, 640, 800};
+    private int mPhotoSize = mSizes[4]; // defaults to 640px
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -61,6 +61,8 @@ public class MainFragment extends Fragment {
         mPhotoRecyclerView = (RecyclerView) view.findViewById(R.id.photo_recycler_view);
 
         mPhotoRecyclerView.addItemDecoration(new SpacesItemDecoration(5));
+
+        setPhotoSize();
 
         setLayoutManager();
 
@@ -101,7 +103,6 @@ public class MainFragment extends Fragment {
             default:
                 return super.onOptionsItemSelected(item);
         }
-
     }
 
     @Override
@@ -135,7 +136,6 @@ public class MainFragment extends Fragment {
 
     private class PhotoHolder extends RecyclerView.ViewHolder implements View.OnLongClickListener, View.OnClickListener {
         private Photo mPhoto;
-
         private ImageView mImageView;
 
         public PhotoHolder(View itemView) {
@@ -146,7 +146,7 @@ public class MainFragment extends Fragment {
             mImageView = (ImageView) itemView.findViewById(R.id.grid_item_photo_image_view);
         }
 
-        public void bindImage(Photo photo) {
+        public void bindImage(Photo photo, int prefSize) {
             mPhoto = photo;
 
             ImageLoader imageLoader = ImageLoader.getInstance();
@@ -154,10 +154,14 @@ public class MainFragment extends Fragment {
                     .cacheOnDisc(true).resetViewBeforeLoading(true)
                     .build();
 
-            String mUri = mPhoto.getImageUri(4); // 4 for 500px - get from config in future
+            String mUri = (prefSize < 0) ? mPhoto.getImageUri(4) : mPhoto.getImageUri(prefSize);
+
+            mImageView.setMaxWidth(mPhotoSize);
+            if (mActualGridType.equals("REGULAR")) {
+                mImageView.setMaxHeight(mPhotoSize);
+            }
 
             imageLoader.displayImage(mUri, mImageView, options);
-
         }
 
         @Override
@@ -185,8 +189,13 @@ public class MainFragment extends Fragment {
 
     private class PhotoAdapter extends RecyclerView.Adapter<PhotoHolder> {
         private List<Photo> mPhotos;
+        private int mSizePref = 4;
+
         public PhotoAdapter(List<Photo> photos) {
             mPhotos = photos;
+
+            SharedPreferences shared = PreferenceManager.getDefaultSharedPreferences(getActivity());
+            mSizePref = Integer.parseInt(shared.getString("pref_grid_image_size", "-1"));
         }
 
         @Override
@@ -199,7 +208,7 @@ public class MainFragment extends Fragment {
         @Override
         public void onBindViewHolder(PhotoHolder holder, int position) {
             Photo photo = mPhotos.get(position);
-            holder.bindImage(photo);
+            holder.bindImage(photo, mSizePref);
         }
         @Override
         public int getItemCount() {
@@ -207,9 +216,26 @@ public class MainFragment extends Fragment {
         }
     }
 
-    public int getNumColumns() {
+    public int getNumColumns(int imageSize) {
         final DisplayMetrics displayMetrics=getResources().getDisplayMetrics();
-        return (int) Math.floor(displayMetrics.widthPixels / 520);
+        return (int) Math.max(Math.floor(displayMetrics.widthPixels / imageSize), 2); // at least 2 columns
+    }
+
+    public void setPhotoSize() {
+        final DisplayMetrics displayMetrics=getResources().getDisplayMetrics();
+        int largestImageSize = (int) Math.floor((Math.min(displayMetrics.widthPixels, displayMetrics.heightPixels) - 5)/2);
+        Log.d(TAG, "setPhotoSize " + Integer.toString(largestImageSize));
+
+        SharedPreferences shared = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        int prefSize = Integer.parseInt(shared.getString("pref_grid_image_size", "-1"));
+
+        Log.d(TAG, "prefSize " + Integer.toString(prefSize));
+
+        if (prefSize < 0) { // auto size images
+            mPhotoSize = (mSizes[4] > largestImageSize) ? largestImageSize : mSizes[4];
+        } else {
+            mPhotoSize = (mSizes[prefSize] > largestImageSize) ? largestImageSize : mSizes[prefSize];
+        }
     }
 
     private void setLayoutManager() {
@@ -217,30 +243,28 @@ public class MainFragment extends Fragment {
         mGridType = shared.getString("pref_grid_type", getString(R.string.pref_grid_type_auto));
 
         if (mGridType.equals(getString(R.string.pref_grid_type_staggered))) {
-            StaggeredGridLayoutManager lm = new StaggeredGridLayoutManager(getNumColumns(), StaggeredGridLayoutManager.VERTICAL);
+            StaggeredGridLayoutManager lm = new StaggeredGridLayoutManager(getNumColumns(mPhotoSize), StaggeredGridLayoutManager.VERTICAL);
             lm.setGapStrategy(StaggeredGridLayoutManager.GAP_HANDLING_NONE);
             mPhotoRecyclerView.setLayoutManager(lm);
+            mActualGridType = "STAGGERED";
         } else if (mGridType.equals(getString(R.string.pref_grid_type_regular))) {
-            GridLayoutManager lm = new GridLayoutManager(getActivity(), getNumColumns());
+            GridLayoutManager lm = new GridLayoutManager(getActivity(), getNumColumns(mPhotoSize));
             mPhotoRecyclerView.setLayoutManager(lm);
+            mActualGridType = "REGULAR";
         } else {
-            WindowManager wm = (WindowManager) getActivity().getSystemService(Context.WINDOW_SERVICE);
-            Display display = wm.getDefaultDisplay();
-            Point size = new Point();
-            display.getSize(size);
-
             int currentapiVersion = android.os.Build.VERSION.SDK_INT;
 
-            Log.d(TAG, "size " + Integer.toString(size.x) + " x " + Integer.toString(size.y));
             Log.d(TAG, "apiversion " + Integer.toString(currentapiVersion));
 
-            if ((currentapiVersion >= android.os.Build.VERSION_CODES.KITKAT) && (size.x >= 800)){ // need KitKat and a decently sized screen
-                StaggeredGridLayoutManager lm = new StaggeredGridLayoutManager(getNumColumns(), StaggeredGridLayoutManager.VERTICAL);
+            if (currentapiVersion >= android.os.Build.VERSION_CODES.KITKAT) { // need KitKat to avoid issues
+                StaggeredGridLayoutManager lm = new StaggeredGridLayoutManager(getNumColumns(mPhotoSize), StaggeredGridLayoutManager.VERTICAL);
                 lm.setGapStrategy(StaggeredGridLayoutManager.GAP_HANDLING_NONE);
                 mPhotoRecyclerView.setLayoutManager(lm);
+                mActualGridType = "STAGGERED";
             } else {
-                GridLayoutManager lm = new GridLayoutManager(getActivity(), getNumColumns());
+                GridLayoutManager lm = new GridLayoutManager(getActivity(), getNumColumns(mPhotoSize));
                 mPhotoRecyclerView.setLayoutManager(lm);
+                mActualGridType = "REGULAR";
             }
         }
     }
@@ -264,7 +288,7 @@ public class MainFragment extends Fragment {
         protected List<Photo> doInBackground(String... params) {
             SharedPreferences shared = PreferenceManager.getDefaultSharedPreferences(getActivity());
             int num = Integer.parseInt(shared.getString("pref_grid_num", "10"));
-            int fetchPoolSize = Math.max(Integer.parseInt(shared.getString("pref_fetch_num", "250")),500);
+            int fetchPoolSize = Math.min(Integer.parseInt(shared.getString("pref_fetch_num", "250")), 500);
 
             List<Photo> photos = new FlickrFetcher().fetchItems(mUser, num, fetchPoolSize);
             return photos;

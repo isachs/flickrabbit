@@ -7,7 +7,7 @@ public class Photo {
     private String mSecret;
     private String mServer;
     private String mFarm;
-    private final String[] mSizes = new String[]{"_t", "_m", "_n", "", "_z", "_c", "_b"};
+    private final String[] mSizes = new String[]{"_t", "_m", "_n", "", "_z", "_c"};
 
     public Photo(String id, String owner, String secret, String server, String farm) {
         mId = id;
@@ -18,7 +18,7 @@ public class Photo {
     }
 
     public String getImageUri(int size) {
-        return "http://farm" + mFarm + ".staticflickr.com/" + mServer + "/" + mId + "_" + mSecret + mSizes[size] + ".jpg";
+        return "http://farm" + mFarm + ".staticflickr.com/" + mServer + "/" + mId + "_" + mSecret + mSizes[size] + ".jpg" + ((mSizes[size].equals("_z")) ? "?zz=1" : "");
     }
 
     public String getPhotoPageUri() {
