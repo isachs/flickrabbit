@@ -143,6 +143,7 @@ public class MainFragment extends Fragment {
         private ImageView mImageView;
         private FrameLayout mFrameLayout;
         private ProgressBar mProgressBar;
+        private int mKnownHeight = 100;
 
         public PhotoHolder(View itemView) {
             super(itemView);
@@ -155,6 +156,7 @@ public class MainFragment extends Fragment {
         }
 
         public void bindImage(Photo photo, int prefSize) {
+            mImageView.setMinimumHeight(mKnownHeight);
             mPhoto = photo;
 
             mProgressBar.setVisibility(View.VISIBLE);
@@ -167,7 +169,6 @@ public class MainFragment extends Fragment {
             String mUri = (prefSize < 0) ? mPhoto.getImageUri(4) : mPhoto.getImageUri(prefSize);
 
             mImageView.getLayoutParams().width = largestImageSize();
-            Log.d(TAG, "mPhotoSize  " + mPhotoSize);
             ViewGroup.LayoutParams lp = mFrameLayout.getLayoutParams();
             lp.width = largestImageSize();
             mFrameLayout.setLayoutParams(lp);
@@ -180,6 +181,7 @@ public class MainFragment extends Fragment {
                 @Override
                 public void onLoadingComplete(String imageUri, View view, Bitmap loadedImage) {
                     mProgressBar.setVisibility(View.GONE);
+                    mKnownHeight = loadedImage.getHeight();
                 }
             });
         }
@@ -204,6 +206,10 @@ public class MainFragment extends Fragment {
                 startActivityForResult(intent, REQUEST_PHOTO);
             }
             return true;
+        }
+
+        public void viewRecycled() {
+            mImageView.setImageResource(0);
         }
     }
 
@@ -230,6 +236,12 @@ public class MainFragment extends Fragment {
             Photo photo = mPhotos.get(position);
             holder.bindImage(photo, mSizePref);
         }
+
+        @Override
+        public void onViewRecycled(PhotoHolder holder) {
+            holder.viewRecycled();
+        }
+
         @Override
         public int getItemCount() {
             return mPhotos.size();
@@ -331,13 +343,10 @@ public class MainFragment extends Fragment {
 
             updateUI();
 
+            mPhotoRecyclerView.smoothScrollToPosition(photoTool.getNumPhotos() - 1);
+            Log.d(TAG, "smoothScroll " + Integer.toString(photoTool.getNumPhotos() - 1));
+
             View pb = getActivity().findViewById(R.id.progress_bar);
-
-            mPhotoRecyclerView.smoothScrollToPosition(0);
-            mPhotoRecyclerView.smoothScrollToPosition(photoTool.getNumPhotos());
-
-            Log.d(TAG, "smoothScroll " + Integer.toString(photoTool.getNumPhotos()));
-
             pb.setVisibility(View.GONE);
         }
     }
