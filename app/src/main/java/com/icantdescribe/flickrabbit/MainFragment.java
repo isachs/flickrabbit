@@ -44,7 +44,6 @@ public class MainFragment extends Fragment {
     private PhotoAdapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
     private String mGridType;
-    private String mActualGridType = "STAGGERED";
     private String mLongPressAction;
 
     private final int[] mSizes = new int[]{100, 240, 320, 500, 640, 800};
@@ -69,14 +68,14 @@ public class MainFragment extends Fragment {
 
         setPhotoSize();
 
-        setLayoutManager();
+        if (mLayoutManager == null) {
+            setLayoutManager();
+        }
 
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
 
         setHasOptionsMenu(true);
-
-        updateUI();
 
         return view;
     }
@@ -114,9 +113,15 @@ public class MainFragment extends Fragment {
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
 
-        setLayoutManager();
-
-        updateUI();
+        if (mLayoutManager.getClass().equals(GridLayoutManager.class)) {
+            GridLayoutManager lm = (GridLayoutManager) mLayoutManager;
+            lm.setSpanCount(getNumColumns(mPhotoSize));
+            mPhotoRecyclerView.setLayoutManager(lm);
+        } else if (mLayoutManager.getClass().equals(StaggeredGridLayoutManager.class)) {
+            StaggeredGridLayoutManager lm = (StaggeredGridLayoutManager) mLayoutManager;
+            lm.setSpanCount(getNumColumns(mPhotoSize));
+            mPhotoRecyclerView.setLayoutManager(lm);
+        }
     }
 
     @Override
