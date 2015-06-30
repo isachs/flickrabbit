@@ -29,8 +29,6 @@ public class FlickrFetcher {
     private static final String METHOD_SIZES = "flickr.photos.getSizes";
     private static final String METHOD_INFO = "flickr.photos.getInfo";
 
-    private int mFetchNum = 250;
-
     public byte[] getUrlBytes(String urlSpec) throws IOException {
         URL url = new URL(urlSpec);
         HttpURLConnection connection = (HttpURLConnection)url.openConnection();
