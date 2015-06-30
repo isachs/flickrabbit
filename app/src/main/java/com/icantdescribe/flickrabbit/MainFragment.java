@@ -42,6 +42,7 @@ public class MainFragment extends Fragment {
 
     private RecyclerView mPhotoRecyclerView;
     private PhotoAdapter mAdapter;
+    private RecyclerView.LayoutManager mLayoutManager;
     private String mGridType;
     private String mActualGridType = "STAGGERED";
     private String mLongPressAction;
@@ -173,7 +174,7 @@ public class MainFragment extends Fragment {
             lp.width = largestImageSize();
             mFrameLayout.setLayoutParams(lp);
 
-            if (mActualGridType.equals("REGULAR")) {
+            if (mLayoutManager.getClass().equals(GridLayoutManager.class)) {
                 mImageView.setMaxHeight(mPhotoSize);
             }
 
@@ -282,12 +283,12 @@ public class MainFragment extends Fragment {
         if (mGridType.equals(getString(R.string.pref_grid_type_staggered))) {
             StaggeredGridLayoutManager lm = new StaggeredGridLayoutManager(getNumColumns(mPhotoSize), StaggeredGridLayoutManager.VERTICAL);
             lm.setGapStrategy(StaggeredGridLayoutManager.GAP_HANDLING_NONE);
+            mLayoutManager = lm;
             mPhotoRecyclerView.setLayoutManager(lm);
-            mActualGridType = "STAGGERED";
         } else if (mGridType.equals(getString(R.string.pref_grid_type_regular))) {
             GridLayoutManager lm = new GridLayoutManager(getActivity(), getNumColumns(mPhotoSize));
+            mLayoutManager = lm;
             mPhotoRecyclerView.setLayoutManager(lm);
-            mActualGridType = "REGULAR";
         } else {
             int currentapiVersion = android.os.Build.VERSION.SDK_INT;
 
@@ -296,12 +297,12 @@ public class MainFragment extends Fragment {
             if (currentapiVersion >= android.os.Build.VERSION_CODES.KITKAT) { // need KitKat to avoid issues
                 StaggeredGridLayoutManager lm = new StaggeredGridLayoutManager(getNumColumns(mPhotoSize), StaggeredGridLayoutManager.VERTICAL);
                 lm.setGapStrategy(StaggeredGridLayoutManager.GAP_HANDLING_NONE);
+                mLayoutManager = lm;
                 mPhotoRecyclerView.setLayoutManager(lm);
-                mActualGridType = "STAGGERED";
             } else {
                 GridLayoutManager lm = new GridLayoutManager(getActivity(), getNumColumns(mPhotoSize));
+                mLayoutManager = lm;
                 mPhotoRecyclerView.setLayoutManager(lm);
-                mActualGridType = "REGULAR";
             }
         }
     }
