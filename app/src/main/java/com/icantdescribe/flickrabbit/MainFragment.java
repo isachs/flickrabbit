@@ -42,7 +42,6 @@ public class MainFragment extends Fragment {
     private String mGridType;
     private String mActualGridType = "STAGGERED";
     private String mLongPressAction;
-    private RecyclerView.LayoutManager mLayoutManager;
 
     private final int[] mSizes = new int[]{100, 240, 320, 500, 640, 800};
     private int mPhotoSize = mSizes[4]; // defaults to 640px
@@ -259,12 +258,10 @@ public class MainFragment extends Fragment {
         if (mGridType.equals(getString(R.string.pref_grid_type_staggered))) {
             StaggeredGridLayoutManager lm = new StaggeredGridLayoutManager(getNumColumns(mPhotoSize), StaggeredGridLayoutManager.VERTICAL);
             lm.setGapStrategy(StaggeredGridLayoutManager.GAP_HANDLING_NONE);
-            mLayoutManager = lm;
             mPhotoRecyclerView.setLayoutManager(lm);
             mActualGridType = "STAGGERED";
         } else if (mGridType.equals(getString(R.string.pref_grid_type_regular))) {
             GridLayoutManager lm = new GridLayoutManager(getActivity(), getNumColumns(mPhotoSize));
-            mLayoutManager = lm;
             mPhotoRecyclerView.setLayoutManager(lm);
             mActualGridType = "REGULAR";
         } else {
@@ -279,7 +276,6 @@ public class MainFragment extends Fragment {
                 mActualGridType = "STAGGERED";
             } else {
                 GridLayoutManager lm = new GridLayoutManager(getActivity(), getNumColumns(mPhotoSize));
-                mLayoutManager = lm;
                 mPhotoRecyclerView.setLayoutManager(lm);
                 mActualGridType = "REGULAR";
             }
