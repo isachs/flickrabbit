@@ -21,6 +21,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
@@ -41,6 +42,7 @@ public class MainFragment extends Fragment {
     private String mGridType;
     private String mActualGridType = "STAGGERED";
     private String mLongPressAction;
+    private RecyclerView.LayoutManager mLayoutManager;
 
     private final int[] mSizes = new int[]{100, 240, 320, 500, 640, 800};
     private int mPhotoSize = mSizes[4]; // defaults to 640px
@@ -137,6 +139,7 @@ public class MainFragment extends Fragment {
     private class PhotoHolder extends RecyclerView.ViewHolder implements View.OnLongClickListener, View.OnClickListener {
         private Photo mPhoto;
         private ImageView mImageView;
+        private FrameLayout mFrameLayout;
 
         public PhotoHolder(View itemView) {
             super(itemView);
@@ -144,6 +147,7 @@ public class MainFragment extends Fragment {
             itemView.setOnLongClickListener(this);
 
             mImageView = (ImageView) itemView.findViewById(R.id.grid_item_photo_image_view);
+            mFrameLayout = (FrameLayout) itemView.findViewById(R.id.grid_item_photo_layout);
         }
 
         public void bindImage(Photo photo, int prefSize) {
@@ -156,7 +160,12 @@ public class MainFragment extends Fragment {
 
             String mUri = (prefSize < 0) ? mPhoto.getImageUri(4) : mPhoto.getImageUri(prefSize);
 
-            mImageView.setMaxWidth(mPhotoSize);
+            mImageView.getLayoutParams().width = largestImageSize();
+            Log.d(TAG, "mPhotoSize  " + mPhotoSize);
+            ViewGroup.LayoutParams lp = mFrameLayout.getLayoutParams();
+            lp.width = largestImageSize();
+            mFrameLayout.setLayoutParams(lp);
+
             if (mActualGridType.equals("REGULAR")) {
                 mImageView.setMaxHeight(mPhotoSize);
             }
@@ -217,8 +226,13 @@ public class MainFragment extends Fragment {
     }
 
     public int getNumColumns(int imageSize) {
-        final DisplayMetrics displayMetrics=getResources().getDisplayMetrics();
+        final DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
         return (int) Math.max(Math.floor(displayMetrics.widthPixels / imageSize), 2); // at least 2 columns
+    }
+
+    public int largestImageSize() {
+        final DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
+        return  displayMetrics.widthPixels / getNumColumns(mPhotoSize);
     }
 
     public void setPhotoSize() {
@@ -245,10 +259,12 @@ public class MainFragment extends Fragment {
         if (mGridType.equals(getString(R.string.pref_grid_type_staggered))) {
             StaggeredGridLayoutManager lm = new StaggeredGridLayoutManager(getNumColumns(mPhotoSize), StaggeredGridLayoutManager.VERTICAL);
             lm.setGapStrategy(StaggeredGridLayoutManager.GAP_HANDLING_NONE);
+            mLayoutManager = lm;
             mPhotoRecyclerView.setLayoutManager(lm);
             mActualGridType = "STAGGERED";
         } else if (mGridType.equals(getString(R.string.pref_grid_type_regular))) {
             GridLayoutManager lm = new GridLayoutManager(getActivity(), getNumColumns(mPhotoSize));
+            mLayoutManager = lm;
             mPhotoRecyclerView.setLayoutManager(lm);
             mActualGridType = "REGULAR";
         } else {
@@ -263,6 +279,7 @@ public class MainFragment extends Fragment {
                 mActualGridType = "STAGGERED";
             } else {
                 GridLayoutManager lm = new GridLayoutManager(getActivity(), getNumColumns(mPhotoSize));
+                mLayoutManager = lm;
                 mPhotoRecyclerView.setLayoutManager(lm);
                 mActualGridType = "REGULAR";
             }
