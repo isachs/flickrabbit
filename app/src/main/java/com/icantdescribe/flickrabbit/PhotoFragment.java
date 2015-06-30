@@ -3,6 +3,7 @@ package com.icantdescribe.flickrabbit;
 import android.app.Activity;
 import android.app.DialogFragment;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.app.Fragment;
@@ -13,11 +14,13 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 import com.nostra13.universalimageloader.core.assist.ImageScaleType;
+import com.nostra13.universalimageloader.core.listener.SimpleImageLoadingListener;
 
 public class PhotoFragment extends Fragment {
 
@@ -25,6 +28,7 @@ public class PhotoFragment extends Fragment {
 
     private ImageView mImageView;
     private String mPhotoId;
+    private ProgressBar mProgressBar;
 
     public static PhotoFragment newInstance(String photoId) {
         Bundle args = new Bundle();
@@ -65,6 +69,9 @@ public class PhotoFragment extends Fragment {
         View v = inflater.inflate(R.layout.fragment_photo, container, false);
 
         mImageView = (ImageView) v.findViewById(R.id.full_photo_view);
+        mProgressBar = (ProgressBar) v.findViewById(R.id.progress_photo);
+
+        mProgressBar.setVisibility(View.VISIBLE);
 
         mImageView.setOnLongClickListener(new View.OnLongClickListener(){
             @Override
@@ -102,7 +109,12 @@ public class PhotoFragment extends Fragment {
         FlickrFetcher flickrFetcher = new FlickrFetcher();
         String mUri = flickrFetcher.fetchBiggestPhotoUri(mPhotoId);
 
-        imageLoader.displayImage(mUri, mImageView, options);
+        imageLoader.displayImage(mUri, mImageView, options, new SimpleImageLoadingListener() {
+            @Override
+            public void onLoadingComplete(String imageUri, View view, Bitmap loadedImage) {
+                mProgressBar.setVisibility(View.GONE);
+            }
+        });
 
         return v;
     }
