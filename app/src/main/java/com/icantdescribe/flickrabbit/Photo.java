@@ -18,7 +18,7 @@ public class Photo {
     }
 
     public String getImageUri(int size) {
-        return "http://farm" + mFarm + ".staticflickr.com/" + mServer + "/" + mId + "_" + mSecret + mSizes[size] + ".jpg" + ((mSizes[size].equals("_z")) ? "?zz=1" : "");
+        return "http://farm" + mFarm + ".staticflickr.com/" + mServer + "/" + mId + "_" + mSecret + mSizes[size] + ".jpg";
     }
 
     public String getPhotoPageUri() {
