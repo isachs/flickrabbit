@@ -4,6 +4,7 @@ import android.app.DialogFragment;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -23,11 +24,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 import com.nostra13.universalimageloader.core.assist.ImageScaleType;
+import com.nostra13.universalimageloader.core.listener.SimpleImageLoadingListener;
 
 import java.util.List;
 
@@ -139,6 +142,7 @@ public class MainFragment extends Fragment {
         private Photo mPhoto;
         private ImageView mImageView;
         private FrameLayout mFrameLayout;
+        private ProgressBar mProgressBar;
 
         public PhotoHolder(View itemView) {
             super(itemView);
@@ -147,10 +151,13 @@ public class MainFragment extends Fragment {
 
             mImageView = (ImageView) itemView.findViewById(R.id.grid_item_photo_image_view);
             mFrameLayout = (FrameLayout) itemView.findViewById(R.id.grid_item_photo_layout);
+            mProgressBar = (ProgressBar) itemView.findViewById(R.id.progress_image);
         }
 
         public void bindImage(Photo photo, int prefSize) {
             mPhoto = photo;
+
+            mProgressBar.setVisibility(View.VISIBLE);
 
             ImageLoader imageLoader = ImageLoader.getInstance();
             DisplayImageOptions options = new DisplayImageOptions.Builder().cacheInMemory(true)
@@ -169,7 +176,12 @@ public class MainFragment extends Fragment {
                 mImageView.setMaxHeight(mPhotoSize);
             }
 
-            imageLoader.displayImage(mUri, mImageView, options);
+            imageLoader.displayImage(mUri, mImageView, options, new SimpleImageLoadingListener() {
+                @Override
+                public void onLoadingComplete(String imageUri, View view, Bitmap loadedImage) {
+                    mProgressBar.setVisibility(View.GONE);
+                }
+            });
         }
 
         @Override
