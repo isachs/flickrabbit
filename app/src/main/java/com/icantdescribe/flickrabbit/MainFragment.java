@@ -127,7 +127,10 @@ public class MainFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        updateUI();
+
+        if (mAdapter == null) {
+            updateUI();
+        }
     }
 
     private void updateUI() {
