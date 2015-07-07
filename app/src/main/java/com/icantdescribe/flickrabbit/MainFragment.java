@@ -62,8 +62,6 @@ public class MainFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_photo_grid, container, false);
         mPhotoRecyclerView = (RecyclerView) view.findViewById(R.id.photo_recycler_view);
 
-        mPhotoRecyclerView.addItemDecoration(new SpacesItemDecoration(5));
-
         setPhotoSize();
 
         if (mLayoutManager == null) {
