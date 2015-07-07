@@ -34,7 +34,7 @@ import com.nostra13.universalimageloader.core.listener.SimpleImageLoadingListene
 
 import java.util.List;
 
-public class MainFragment extends Fragment {
+public class MainFragment extends Fragment implements SharedPreferences.OnSharedPreferenceChangeListener {
 
     private static final String TAG = "FlickRabbit";
 
@@ -62,8 +62,6 @@ public class MainFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_photo_grid, container, false);
         mPhotoRecyclerView = (RecyclerView) view.findViewById(R.id.photo_recycler_view);
 
-        setPhotoSize();
-
         if (mLayoutManager == null) {
             setLayoutManager();
         }
@@ -90,12 +88,11 @@ public class MainFragment extends Fragment {
                 startActivityForResult(intent, REQUEST_PHOTO);
                 return true;
             case R.id.action_help:
-                DialogFragment newFragment = new HelpFragment();
-                newFragment.show(getFragmentManager(), "help");
+                DialogFragment helpFragment = new HelpFragment();
+                helpFragment.show(getFragmentManager(), "help");
                 return true;
             case R.id.action_refresh:
                 setNumColumns();
-                setPhotoSize();
                 PhotoGallery photoTool = PhotoGallery.get(getActivity());
                 photoTool.intializePhotos(getActivity());
                 mAdapter = new PhotoAdapter(photoTool.getPhotos());
@@ -111,7 +108,16 @@ public class MainFragment extends Fragment {
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
 
+        mAdapter.setPhotoSize();
         setNumColumns();
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        prefs.registerOnSharedPreferenceChangeListener(this);
     }
 
     @Override
@@ -119,6 +125,25 @@ public class MainFragment extends Fragment {
         super.onResume();
 
         if (mAdapter == null) {
+            updateUI();
+        }
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        prefs.unregisterOnSharedPreferenceChangeListener(this);
+    }
+
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+        Log.d(TAG, "Preference changed: " + key);
+
+        if (key.equals("pref_grid_image_size") || key.equals("pref_grid_type")) {
+            mAdapter.setPhotoSize();
+            setNumColumns();
             updateUI();
         }
     }
@@ -218,6 +243,7 @@ public class MainFragment extends Fragment {
 
         public PhotoAdapter(List<Photo> photos) {
             mPhotos = photos;
+            setPhotoSize();
 
             SharedPreferences shared = PreferenceManager.getDefaultSharedPreferences(getActivity());
             mSizePref = Integer.parseInt(shared.getString("pref_grid_image_size", "-1"));
@@ -245,6 +271,24 @@ public class MainFragment extends Fragment {
         public int getItemCount() {
             return mPhotos.size();
         }
+
+        public void setPhotoSize() {
+            final DisplayMetrics displayMetrics=getResources().getDisplayMetrics();
+            int largestImageSize = (int) Math.floor((Math.min(displayMetrics.widthPixels, displayMetrics.heightPixels) - 5)/2);
+            Log.d(TAG, "setPhotoSize " + Integer.toString(largestImageSize));
+
+            SharedPreferences shared = PreferenceManager.getDefaultSharedPreferences(getActivity());
+            int prefSize = Integer.parseInt(shared.getString("pref_grid_image_size", "-1"));
+            mSizePref = prefSize;
+
+            Log.d(TAG, "prefSize " + Integer.toString(prefSize));
+
+            if (prefSize < 0) { // auto size images
+                mPhotoSize = (mSizes[4] > largestImageSize) ? largestImageSize : mSizes[4];
+            } else {
+                mPhotoSize = (mSizes[prefSize] > largestImageSize) ? largestImageSize : mSizes[prefSize];
+            }
+        }
     }
 
     public int getNumColumns(int imageSize) {
@@ -267,23 +311,6 @@ public class MainFragment extends Fragment {
     public int getLargestImageSize() {
         final DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
         return  displayMetrics.widthPixels / getNumColumns(mPhotoSize);
-    }
-
-    public void setPhotoSize() {
-        final DisplayMetrics displayMetrics=getResources().getDisplayMetrics();
-        int largestImageSize = (int) Math.floor((Math.min(displayMetrics.widthPixels, displayMetrics.heightPixels) - 5)/2);
-        Log.d(TAG, "setPhotoSize " + Integer.toString(largestImageSize));
-
-        SharedPreferences shared = PreferenceManager.getDefaultSharedPreferences(getActivity());
-        int prefSize = Integer.parseInt(shared.getString("pref_grid_image_size", "-1"));
-
-        Log.d(TAG, "prefSize " + Integer.toString(prefSize));
-
-        if (prefSize < 0) { // auto size images
-            mPhotoSize = (mSizes[4] > largestImageSize) ? largestImageSize : mSizes[4];
-        } else {
-            mPhotoSize = (mSizes[prefSize] > largestImageSize) ? largestImageSize : mSizes[prefSize];
-        }
     }
 
     private void setLayoutManager() {
