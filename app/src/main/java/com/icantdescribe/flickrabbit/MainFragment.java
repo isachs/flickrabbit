@@ -45,7 +45,8 @@ public class MainFragment extends Fragment implements SharedPreferences.OnShared
     private RecyclerView.LayoutManager mLayoutManager;
 
     private final int[] mSizes = new int[]{100, 240, 320, 500, 640, 800};
-    private int mPhotoSize = mSizes[4]; // defaults to 640px
+    private final int DEFAULT_SIZE = 4;
+    private int mPhotoSize = mSizes[DEFAULT_SIZE]; // defaults to 640px
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -284,7 +285,7 @@ public class MainFragment extends Fragment implements SharedPreferences.OnShared
             Log.d(TAG, "prefSize " + Integer.toString(prefSize));
 
             if (prefSize < 0) { // auto size images
-                mPhotoSize = (mSizes[4] > largestImageSize) ? largestImageSize : mSizes[4];
+                mPhotoSize = (mSizes[DEFAULT_SIZE] > largestImageSize) ? largestImageSize : mSizes[DEFAULT_SIZE];
             } else {
                 mPhotoSize = (mSizes[prefSize] > largestImageSize) ? largestImageSize : mSizes[prefSize];
             }
