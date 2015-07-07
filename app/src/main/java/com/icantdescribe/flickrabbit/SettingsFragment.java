@@ -1,6 +1,5 @@
 package com.icantdescribe.flickrabbit;
 
-import android.graphics.Color;
 import android.os.Bundle;
 import android.preference.PreferenceFragment;
 
