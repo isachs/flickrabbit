@@ -28,6 +28,8 @@ public class FlickrFetcher {
     private static final String METHOD_FAVES = "flickr.favorites.getList";
     private static final String METHOD_SIZES = "flickr.photos.getSizes";
     private static final String METHOD_INFO = "flickr.photos.getInfo";
+    private static final String METHOD_USERNAME = "flickr.people.findByUsername";
+    private static final String METHOD_USER_URL = "flickr.urls.lookupUser";
 
     public byte[] getUrlBytes(String urlSpec) throws IOException {
         URL url = new URL(urlSpec);
@@ -58,13 +60,56 @@ public class FlickrFetcher {
     public List<Photo> fetchItems(String user, int num, int fetchPoolSize) {
 
         List<Photo> items = new ArrayList<>();
+        String userId = "";
+
+        if (user.contains("@")) { // if user string doesn't contain '@' it's a username from prefs, not a userid
+            userId = user;
+        } else {
+            try {
+                String url = Uri.parse(ENDPOINT)
+                        .buildUpon()
+                        .appendQueryParameter("method", METHOD_USERNAME)
+                        .appendQueryParameter("api_key", API_KEY)
+                        .appendQueryParameter("username", user)
+                        .appendQueryParameter("format", "json")
+                        .appendQueryParameter("nojsoncallback", "1")
+                        .build().toString();
+                String jsonString = getUrlString(url);
+                Log.i(TAG, "Received JSON: " + jsonString);
+                JSONObject jsonBody = new JSONObject(jsonString);
+
+                if (jsonBody.getString("stat").equals("fail")) { // input id wasn't a username, try url method
+                    String url2 = Uri.parse(ENDPOINT)
+                            .buildUpon()
+                            .appendQueryParameter("method", METHOD_USER_URL)
+                            .appendQueryParameter("api_key", API_KEY)
+                            .appendQueryParameter("url", "flickr.com/photos/" + user)
+                            .appendQueryParameter("format", "json")
+                            .appendQueryParameter("nojsoncallback", "1")
+                            .build().toString();
+                    String jsonString2 = getUrlString(url2);
+                    Log.i(TAG, "Received JSON: " + jsonString2);
+                    JSONObject jsonBody2 = new JSONObject(jsonString2);
+
+                    JSONObject userJsonObject = jsonBody2.getJSONObject("user");
+                    userId = userJsonObject.getString("id");
+                } else {
+                    JSONObject userJsonObject = jsonBody.getJSONObject("user");
+                    userId = userJsonObject.getString("id");
+                }
+            } catch (JSONException je) {
+                Log.e(TAG, "Failed to parse JSON", je);
+            } catch (IOException ioe) {
+                Log.e(TAG, "Failed to fetch items", ioe);
+            }
+        }
 
         try {
             String url = Uri.parse(ENDPOINT)
                     .buildUpon()
                     .appendQueryParameter("method", METHOD_FAVES)
                     .appendQueryParameter("api_key", API_KEY)
-                    .appendQueryParameter("user_id", user)
+                    .appendQueryParameter("user_id", userId)
                     .appendQueryParameter("per_page", String.valueOf(fetchPoolSize))
                     .appendQueryParameter("format", "json")
                     .appendQueryParameter("nojsoncallback", "1")
