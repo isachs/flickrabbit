@@ -43,8 +43,6 @@ public class MainFragment extends Fragment {
     private RecyclerView mPhotoRecyclerView;
     private PhotoAdapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
-    private String mGridType;
-    private String mLongPressAction;
 
     private final int[] mSizes = new int[]{100, 240, 320, 500, 640, 800};
     private int mPhotoSize = mSizes[4]; // defaults to 640px
@@ -203,9 +201,9 @@ public class MainFragment extends Fragment {
         @Override
         public boolean onLongClick(View v) {
             SharedPreferences shared = PreferenceManager.getDefaultSharedPreferences(getActivity());
-            mLongPressAction = shared.getString("pref_long_click", getString(R.string.pref_long_click_photo_view));
+            String longPressAction = shared.getString("pref_long_click", getString(R.string.pref_long_click_photo_view));
 
-            if (mLongPressAction.equals(getString(R.string.pref_long_click_flickr))) {
+            if (longPressAction.equals(getString(R.string.pref_long_click_flickr))) {
                 String uri = new FlickrFetcher().fetchPhotoPageUri(mPhoto.getId());
 
                 Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(uri));
@@ -286,14 +284,14 @@ public class MainFragment extends Fragment {
 
     private void setLayoutManager() {
         SharedPreferences shared = PreferenceManager.getDefaultSharedPreferences(getActivity());
-        mGridType = shared.getString("pref_grid_type", getString(R.string.pref_grid_type_auto));
+        String gridType = shared.getString("pref_grid_type", getString(R.string.pref_grid_type_auto));
 
-        if (mGridType.equals(getString(R.string.pref_grid_type_staggered))) {
+        if (gridType.equals(getString(R.string.pref_grid_type_staggered))) {
             StaggeredGridLayoutManager lm = new StaggeredGridLayoutManager(getNumColumns(mPhotoSize), StaggeredGridLayoutManager.VERTICAL);
             lm.setGapStrategy(StaggeredGridLayoutManager.GAP_HANDLING_NONE);
             mLayoutManager = lm;
             mPhotoRecyclerView.setLayoutManager(lm);
-        } else if (mGridType.equals(getString(R.string.pref_grid_type_regular))) {
+        } else if (gridType.equals(getString(R.string.pref_grid_type_regular))) {
             GridLayoutManager lm = new GridLayoutManager(getActivity(), getNumColumns(mPhotoSize));
             mLayoutManager = lm;
             mPhotoRecyclerView.setLayoutManager(lm);
