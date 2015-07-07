@@ -94,6 +94,8 @@ public class MainFragment extends Fragment {
                 newFragment.show(getFragmentManager(), "help");
                 return true;
             case R.id.action_refresh:
+                setNumColumns();
+                setPhotoSize();
                 PhotoGallery photoTool = PhotoGallery.get(getActivity());
                 photoTool.intializePhotos(getActivity());
                 mAdapter = new PhotoAdapter(photoTool.getPhotos());
@@ -109,15 +111,7 @@ public class MainFragment extends Fragment {
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
 
-        if (mLayoutManager.getClass().equals(GridLayoutManager.class)) {
-            GridLayoutManager lm = (GridLayoutManager) mLayoutManager;
-            lm.setSpanCount(getNumColumns(mPhotoSize));
-            mPhotoRecyclerView.setLayoutManager(lm);
-        } else if (mLayoutManager.getClass().equals(StaggeredGridLayoutManager.class)) {
-            StaggeredGridLayoutManager lm = (StaggeredGridLayoutManager) mLayoutManager;
-            lm.setSpanCount(getNumColumns(mPhotoSize));
-            mPhotoRecyclerView.setLayoutManager(lm);
-        }
+        setNumColumns();
     }
 
     @Override
@@ -173,9 +167,9 @@ public class MainFragment extends Fragment {
 
             String mUri = (prefSize < 0) ? mPhoto.getImageUri(4) : mPhoto.getImageUri(prefSize);
 
-            mImageView.getLayoutParams().width = largestImageSize();
+            mImageView.getLayoutParams().width = getLargestImageSize();
             ViewGroup.LayoutParams lp = mFrameLayout.getLayoutParams();
-            lp.width = largestImageSize();
+            lp.width = getLargestImageSize();
             mFrameLayout.setLayoutParams(lp);
 
             if (mLayoutManager.getClass().equals(GridLayoutManager.class)) {
@@ -258,7 +252,19 @@ public class MainFragment extends Fragment {
         return (int) Math.max(Math.floor(displayMetrics.widthPixels / imageSize), 2); // at least 2 columns
     }
 
-    public int largestImageSize() {
+    public void setNumColumns() {
+        if (mLayoutManager.getClass().equals(GridLayoutManager.class)) {
+            GridLayoutManager lm = (GridLayoutManager) mLayoutManager;
+            lm.setSpanCount(getNumColumns(mPhotoSize));
+            mPhotoRecyclerView.setLayoutManager(lm);
+        } else if (mLayoutManager.getClass().equals(StaggeredGridLayoutManager.class)) {
+            StaggeredGridLayoutManager lm = (StaggeredGridLayoutManager) mLayoutManager;
+            lm.setSpanCount(getNumColumns(mPhotoSize));
+            mPhotoRecyclerView.setLayoutManager(lm);
+        }
+    }
+
+    public int getLargestImageSize() {
         final DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
         return  displayMetrics.widthPixels / getNumColumns(mPhotoSize);
     }
