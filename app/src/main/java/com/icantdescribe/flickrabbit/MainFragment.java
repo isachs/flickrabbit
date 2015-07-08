@@ -1,6 +1,8 @@
 package com.icantdescribe.flickrabbit;
 
+import android.app.AlertDialog;
 import android.app.DialogFragment;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
@@ -14,6 +16,7 @@ import android.preference.PreferenceManager;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.InputType;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -22,6 +25,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
@@ -78,7 +82,16 @@ public class MainFragment extends Fragment implements SharedPreferences.OnShared
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
+
         inflater.inflate(R.menu.menu_main, menu);
+
+        SharedPreferences shared = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        String flickrUserId = shared.getString("pref_userid", "40786724@N00");
+
+        if (!(flickrUserId.equals("40786724@N00"))) {
+            MenuItem logInMenuItem = menu.findItem(R.id.action_change_id);
+            logInMenuItem.setVisible(false);
+        }
     }
 
     @Override
@@ -100,6 +113,34 @@ public class MainFragment extends Fragment implements SharedPreferences.OnShared
                 mPhotoRecyclerView.setAdapter(mAdapter);
                 setLayoutManager();
                 return true;
+            case R.id.action_change_id:
+                AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                builder.setTitle(getString(R.string.pref_userid));
+                builder.setMessage(getString(R.string.pref_userid_summ));
+                final EditText input = new EditText(getActivity());
+                input.setInputType(InputType.TYPE_CLASS_TEXT);
+                SharedPreferences shared = PreferenceManager.getDefaultSharedPreferences(getActivity());
+                String flickrUserId = shared.getString("pref_userid", "40786724@N00");
+                input.setText(flickrUserId);
+                builder.setView(input);
+                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        String inputText = "";
+                        inputText = input.getText().toString();
+                        SharedPreferences shared = PreferenceManager.getDefaultSharedPreferences(getActivity());
+                        SharedPreferences.Editor editor = shared.edit();
+                        editor.putString("pref_userid", inputText);
+                        editor.commit();
+                    }
+                });
+                builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.cancel();
+                    }
+                });
+                builder.show();
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -146,6 +187,13 @@ public class MainFragment extends Fragment implements SharedPreferences.OnShared
             mAdapter.setPhotoSize();
             setNumColumns();
             updateUI();
+        } else if (key.equals("pref_userid")) {
+            getActivity().invalidateOptionsMenu();
+            PhotoGallery photoTool = PhotoGallery.get(getActivity());
+            photoTool.intializePhotos(getActivity());
+            mAdapter = new PhotoAdapter(photoTool.getPhotos());
+            mPhotoRecyclerView.setAdapter(mAdapter);
+            setLayoutManager();
         }
     }
 
