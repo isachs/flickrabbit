@@ -116,36 +116,41 @@ public class MainFragment extends Fragment implements SharedPreferences.OnShared
                 startRefreshItems();
                 return true;
             case R.id.action_change_id:
-                AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-                builder.setTitle(getString(R.string.pref_userid));
-                builder.setMessage(getString(R.string.pref_userid_summ));
-                final EditText input = new EditText(getActivity());
-                input.setInputType(InputType.TYPE_CLASS_TEXT);
-                SharedPreferences shared = PreferenceManager.getDefaultSharedPreferences(getActivity());
-                String flickrUserId = shared.getString("pref_userid", "40786724@N00");
-                input.setText(flickrUserId);
-                builder.setView(input);
-                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        String inputText = "";
-                        inputText = input.getText().toString();
-                        SharedPreferences shared = PreferenceManager.getDefaultSharedPreferences(getActivity());
-                        SharedPreferences.Editor editor = shared.edit();
-                        editor.putString("pref_userid", inputText);
-                        editor.commit();
-                    }
-                });
-                builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.cancel();
-                    }
-                });
-                builder.show();
+                changeId();
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    public void changeId() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setTitle(getString(R.string.pref_userid));
+        builder.setMessage(getString(R.string.pref_userid_summ));
+        final EditText input = new EditText(getActivity());
+        input.setInputType(InputType.TYPE_CLASS_TEXT);
+        SharedPreferences shared = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        String flickrUserId = shared.getString("pref_userid", "40786724@N00");
+        input.setText(flickrUserId);
+        builder.setView(input);
+        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                String inputText = "";
+                inputText = input.getText().toString();
+                SharedPreferences shared = PreferenceManager.getDefaultSharedPreferences(getActivity());
+                SharedPreferences.Editor editor = shared.edit();
+                editor.putString("pref_userid", inputText);
+                editor.commit();
+            }
+        });
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+        builder.show();
     }
 
     @Override
