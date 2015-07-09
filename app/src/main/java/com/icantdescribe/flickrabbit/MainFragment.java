@@ -468,10 +468,12 @@ public class MainFragment extends Fragment implements SharedPreferences.OnShared
                 photoTool.addPhoto(photos.get(i));
             }
 
-            updateAdapter(mNum);
+            if (photos.size() > 0) {
+                updateAdapter(photos.size());
 
-            mPhotoRecyclerView.smoothScrollToPosition(photoTool.getNumPhotos() - 1);
-            Log.d(TAG, "smoothScroll " + Integer.toString(photoTool.getNumPhotos() - 1));
+                mPhotoRecyclerView.smoothScrollToPosition(photoTool.getNumPhotos() - 1);
+                Log.d(TAG, "smoothScroll " + Integer.toString(photoTool.getNumPhotos() - 1));
+            }
 
             mSwipeLayout.setRefreshing(false);
         }
