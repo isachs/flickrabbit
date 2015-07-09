@@ -195,14 +195,20 @@ public class MainFragment extends Fragment implements SharedPreferences.OnShared
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
         Log.d(TAG, "Preference changed: " + key);
 
-        if (key.equals("pref_grid_image_size") || key.equals("pref_grid_type")) {
+        if (key.equals("pref_grid_image_size")) {
             mAdapter.setPhotoSize();
             setNumColumns();
             updateUI();
+            Log.d(TAG, "Triggered grid change");
         } else if (key.equals("pref_userid")) {
             mSwipeLayout.setRefreshing(true);
             getActivity().invalidateOptionsMenu();
             startRefreshItems();
+        } else if (key.equals("pref_grid_type")) {
+            mAdapter.setPhotoSize();
+            setNumColumns();
+            setLayoutManager();
+            updateUI();
         }
     }
 
