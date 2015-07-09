@@ -13,6 +13,7 @@ import android.os.Bundle;
 import android.os.StrictMode;
 import android.app.Fragment;
 import android.preference.PreferenceManager;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -38,7 +39,7 @@ import com.nostra13.universalimageloader.core.listener.SimpleImageLoadingListene
 
 import java.util.List;
 
-public class MainFragment extends Fragment implements SharedPreferences.OnSharedPreferenceChangeListener {
+public class MainFragment extends Fragment implements SharedPreferences.OnSharedPreferenceChangeListener, SwipeRefreshLayout.OnRefreshListener {
 
     private static final String TAG = "FlickRabbit";
 
@@ -47,6 +48,8 @@ public class MainFragment extends Fragment implements SharedPreferences.OnShared
     private RecyclerView mPhotoRecyclerView;
     private PhotoAdapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
+    private SwipeRefreshLayout mSwipeLayout;
+    private PhotoGallery mPhotoTool;
 
     private final int[] mSizes = new int[]{100, 240, 320, 500, 640, 800};
     private final int DEFAULT_SIZE = 4;
@@ -54,6 +57,7 @@ public class MainFragment extends Fragment implements SharedPreferences.OnShared
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+
         DisplayImageOptions defaultOptions = new DisplayImageOptions.Builder()
                 .cacheOnDisk(true).cacheInMemory(true)
                 .imageScaleType(ImageScaleType.EXACTLY_STRETCHED).build();
@@ -66,6 +70,8 @@ public class MainFragment extends Fragment implements SharedPreferences.OnShared
 
         View view = inflater.inflate(R.layout.fragment_photo_grid, container, false);
         mPhotoRecyclerView = (RecyclerView) view.findViewById(R.id.photo_recycler_view);
+        mSwipeLayout = (SwipeRefreshLayout) view.findViewById(R.id.swipe_container);
+        mSwipeLayout.setOnRefreshListener(this);
 
         if (mLayoutManager == null) {
             setLayoutManager();
@@ -106,12 +112,8 @@ public class MainFragment extends Fragment implements SharedPreferences.OnShared
                 helpFragment.show(getFragmentManager(), "help");
                 return true;
             case R.id.action_refresh:
-                setNumColumns();
-                PhotoGallery photoTool = PhotoGallery.get(getActivity());
-                photoTool.intializePhotos(getActivity());
-                mAdapter = new PhotoAdapter(photoTool.getPhotos());
-                mPhotoRecyclerView.setAdapter(mAdapter);
-                setLayoutManager();
+                mSwipeLayout.setRefreshing(true);
+                startRefreshItems();
                 return true;
             case R.id.action_change_id:
                 AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
@@ -180,6 +182,11 @@ public class MainFragment extends Fragment implements SharedPreferences.OnShared
     }
 
     @Override
+    public void onRefresh() {
+        startRefreshItems();
+    }
+
+    @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
         Log.d(TAG, "Preference changed: " + key);
 
@@ -188,13 +195,33 @@ public class MainFragment extends Fragment implements SharedPreferences.OnShared
             setNumColumns();
             updateUI();
         } else if (key.equals("pref_userid")) {
+            mSwipeLayout.setRefreshing(true);
             getActivity().invalidateOptionsMenu();
-            PhotoGallery photoTool = PhotoGallery.get(getActivity());
-            photoTool.intializePhotos(getActivity());
-            mAdapter = new PhotoAdapter(photoTool.getPhotos());
-            mPhotoRecyclerView.setAdapter(mAdapter);
-            setLayoutManager();
+            startRefreshItems();
         }
+    }
+
+    public void startRefreshItems() {
+        setNumColumns();
+
+        InitializeItemsTask initializeItemsTask = new InitializeItemsTask(new RefreshCallback() {
+            @Override
+            public void onTaskDone() {
+                finishRefreshItems();
+            }
+        });
+        initializeItemsTask.execute();
+    }
+
+    public interface RefreshCallback {
+        void onTaskDone();
+    }
+
+    public void finishRefreshItems() {
+        mAdapter = new PhotoAdapter(mPhotoTool.getPhotos());
+        mPhotoRecyclerView.setAdapter(mAdapter);
+        setLayoutManager();
+        mSwipeLayout.setRefreshing(false);
     }
 
     private void updateUI() {
@@ -404,8 +431,7 @@ public class MainFragment extends Fragment implements SharedPreferences.OnShared
 
         @Override
         protected void onPreExecute() {
-            View pb = getActivity().findViewById(R.id.progress_bar);
-            pb.setVisibility(View.VISIBLE);
+            mSwipeLayout.setRefreshing(true);
         }
 
         @Override
@@ -433,8 +459,27 @@ public class MainFragment extends Fragment implements SharedPreferences.OnShared
             mPhotoRecyclerView.smoothScrollToPosition(photoTool.getNumPhotos() - 1);
             Log.d(TAG, "smoothScroll " + Integer.toString(photoTool.getNumPhotos() - 1));
 
-            View pb = getActivity().findViewById(R.id.progress_bar);
-            pb.setVisibility(View.GONE);
+            mSwipeLayout.setRefreshing(false);
+        }
+    }
+
+    private class InitializeItemsTask extends AsyncTask<Void, Void, Void> {
+        private RefreshCallback mRefreshCallback;
+
+        public InitializeItemsTask(RefreshCallback refreshCallback) {
+            mRefreshCallback = refreshCallback;
+        }
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            mPhotoTool = PhotoGallery.get(getActivity());
+            mPhotoTool.intializePhotos(getActivity());
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void result) {
+            mRefreshCallback.onTaskDone();
         }
     }
 
