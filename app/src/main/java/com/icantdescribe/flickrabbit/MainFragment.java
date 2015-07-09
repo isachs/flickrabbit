@@ -236,17 +236,19 @@ public class MainFragment extends Fragment implements SharedPreferences.OnShared
     }
 
     private void updateUI() {
-        PhotoGallery photoTool = PhotoGallery.get(getActivity());
-        List<Photo> photos = photoTool.getPhotos();
-
         if (mAdapter == null) {
+            mPhotoTool = PhotoGallery.get(getActivity());
+            List<Photo> photos = mPhotoTool.getPhotos();
             mAdapter = new PhotoAdapter(photos);
             mPhotoRecyclerView.setAdapter(mAdapter);
         } else {
             mAdapter.notifyDataSetChanged();
         }
+    }
 
-        Log.i(TAG, "updateUI " + Integer.toString(photos.size()));
+    private void updateAdapter(int numNewPhotos) {
+        int start = mPhotoTool.getNumPhotos() - numNewPhotos;
+        mAdapter.notifyItemRangeInserted(start, numNewPhotos);
     }
 
     private class PhotoHolder extends RecyclerView.ViewHolder implements View.OnLongClickListener, View.OnClickListener {
@@ -434,6 +436,7 @@ public class MainFragment extends Fragment implements SharedPreferences.OnShared
     private class FetchItemsTask extends AsyncTask<String,Void,List<Photo>> {
 
         private String mUser = new String();
+        private int mNum = 0;
 
         public FetchItemsTask(String user) {
             super();
@@ -448,10 +451,10 @@ public class MainFragment extends Fragment implements SharedPreferences.OnShared
         @Override
         protected List<Photo> doInBackground(String... params) {
             SharedPreferences shared = PreferenceManager.getDefaultSharedPreferences(getActivity());
-            int num = Integer.parseInt(shared.getString("pref_grid_num", "10"));
+            mNum = Integer.parseInt(shared.getString("pref_grid_num", "10"));
             int fetchPoolSize = Math.min(Integer.parseInt(shared.getString("pref_fetch_num", "250")), 500);
 
-            List<Photo> photos = new FlickrFetcher().fetchItems(mUser, num, fetchPoolSize);
+            List<Photo> photos = new FlickrFetcher().fetchItems(mUser, mNum, fetchPoolSize);
             return photos;
         }
 
@@ -465,7 +468,7 @@ public class MainFragment extends Fragment implements SharedPreferences.OnShared
                 photoTool.addPhoto(photos.get(i));
             }
 
-            updateUI();
+            updateAdapter(mNum);
 
             mPhotoRecyclerView.smoothScrollToPosition(photoTool.getNumPhotos() - 1);
             Log.d(TAG, "smoothScroll " + Integer.toString(photoTool.getNumPhotos() - 1));
