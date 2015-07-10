@@ -12,6 +12,13 @@
         android:entries="@array/pref_grid_type_entries"
         android:entryValues="@array/pref_grid_type_values"
         android:defaultValue="@string/pref_grid_type_auto" />
+    <ListPreference
+        android:key="pref_grid_image_size"
+        android:title="@string/pref_grid_image_size"
+        android:summary="@string/pref_grid_image_size_summ"
+        android:entries="@array/pref_grid_image_size_entries"
+        android:entryValues="@array/pref_grid_image_size_values"
+        android:defaultValue="-1" />
     <EditTextPreference
         android:key="pref_grid_num"
         android:inputType="number"
@@ -30,13 +37,6 @@
         android:summary="@string/pref_long_click_summ"
         android:entries="@array/pref_long_click_entries"
         android:entryValues="@array/pref_long_click_values"
-        android:defaultValue="@string/pref_long_click_photo_view" />
-    <ListPreference
-        android:key="pref_grid_image_size"
-        android:title="@string/pref_grid_image_size"
-        android:summary="@string/pref_grid_image_size_summ"
-        android:entries="@array/pref_grid_image_size_entries"
-        android:entryValues="@array/pref_grid_image_size_values"
-        android:defaultValue="-1" />
+        android:defaultValue="@string/pref_long_click_flickr" />
         />
 </PreferenceScreen>
