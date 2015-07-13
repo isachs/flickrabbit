@@ -256,7 +256,7 @@ public class MainFragment extends Fragment implements SharedPreferences.OnShared
         private ImageView mImageView;
         private FrameLayout mFrameLayout;
         private ProgressBar mProgressBar;
-        private int mKnownHeight = 100;
+        private int mKnownHeight = mPhotoSize;
 
         public PhotoHolder(View itemView) {
             super(itemView);
