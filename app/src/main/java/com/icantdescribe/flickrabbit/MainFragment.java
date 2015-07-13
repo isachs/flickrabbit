@@ -24,8 +24,11 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -270,9 +273,19 @@ public class MainFragment extends Fragment implements SharedPreferences.OnShared
             itemView.setOnClickListener(this);
             itemView.setOnLongClickListener(this);
 
-            mImageView = (ImageView) itemView.findViewById(R.id.grid_item_photo_image_view);
             mFrameLayout = (FrameLayout) itemView.findViewById(R.id.grid_item_photo_layout);
             mProgressBar = (ProgressBar) itemView.findViewById(R.id.progress_image);
+            mImageView = (ImageView) itemView.findViewById(R.id.grid_item_photo_image_view);
+            mImageView.setOnTouchListener(new View.OnTouchListener() {
+                 Animation animation = AnimationUtils.loadAnimation(getActivity(), R.anim.img_fade_in);
+                 @Override
+                 public boolean onTouch(View v, MotionEvent event) {
+                     if(event.getAction() == MotionEvent.ACTION_DOWN) {
+                         mImageView.startAnimation(animation);
+                     }
+                     return false;
+                 }
+            });
         }
 
         public void bindImage(Photo photo, int prefSize) {
