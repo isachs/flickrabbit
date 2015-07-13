@@ -299,7 +299,7 @@ public class MainFragment extends Fragment implements SharedPreferences.OnShared
                     .cacheOnDisc(true).resetViewBeforeLoading(true)
                     .build();
 
-            String mUri = (prefSize < 0) ? mPhoto.getImageUri(4) : mPhoto.getImageUri(prefSize);
+            String mUri = (prefSize < 0) ? mPhoto.getImageUri(DEFAULT_SIZE) : mPhoto.getImageUri(prefSize);
 
             mImageView.getLayoutParams().width = getLargestImageSize();
             ViewGroup.LayoutParams lp = mFrameLayout.getLayoutParams();
@@ -327,7 +327,7 @@ public class MainFragment extends Fragment implements SharedPreferences.OnShared
         @Override
         public boolean onLongClick(View v) {
             SharedPreferences shared = PreferenceManager.getDefaultSharedPreferences(getActivity());
-            String longPressAction = shared.getString("pref_long_click", getString(R.string.pref_long_click_photo_view));
+            String longPressAction = shared.getString("pref_long_click", getString(R.string.pref_long_click_flickr));
 
             if (longPressAction.equals(getString(R.string.pref_long_click_flickr))) {
                 String uri = new FlickrFetcher().fetchPhotoPageUri(mPhoto.getId());
