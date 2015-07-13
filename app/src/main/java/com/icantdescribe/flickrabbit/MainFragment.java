@@ -233,6 +233,13 @@ public class MainFragment extends Fragment implements SharedPreferences.OnShared
         mPhotoRecyclerView.setAdapter(mAdapter);
         setLayoutManager();
         mSwipeLayout.setRefreshing(false);
+
+        View nullTextView = getActivity().findViewById(R.id.grid_null_state);
+        if (mAdapter.getItemCount() == 0) {
+            nullTextView.setVisibility(View.VISIBLE);
+        } else {
+            nullTextView.setVisibility(View.GONE);
+        }
     }
 
     private void updateUI() {
