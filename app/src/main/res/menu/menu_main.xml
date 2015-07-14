@@ -3,9 +3,9 @@
     xmlns:tools="http://schemas.android.com/tools" tools:context=".MainActivity">
     <item android:id="@+id/action_change_id" android:title="@string/action_change_id"
         android:orderInCategory="10" app:showAsAction="always" />
-    <item android:id="@+id/action_refresh" android:title="@string/action_refresh"
-          android:orderInCategory="20" app:showAsAction="ifRoom" />
     <item android:id="@+id/action_help" android:title="@string/action_help"
+        android:orderInCategory="20" app:showAsAction="ifRoom" />
+    <item android:id="@+id/action_refresh" android:title="@string/action_refresh"
           android:orderInCategory="40" app:showAsAction="ifRoom" />
     <item android:id="@+id/action_settings" android:title="@string/action_settings"
         android:orderInCategory="100" app:showAsAction="ifRoom" />
