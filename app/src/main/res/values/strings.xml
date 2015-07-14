@@ -10,10 +10,10 @@
     <string name="action_flickr">Open in Flickr</string>
     <string name="action_ok">OK</string>
 
-    <string name="grid_null_state">Failed to load images!\nThis may be because of network issues or an incorrectly entered Flickr username.</string>
+    <string name="grid_null_state">Couldn\'t fetch images!\nCheck your network connection and that your Flickr username is entered correctly.</string>
 
     <string name="help_title">Help</string>
-    <string name="help_text">Tap a photo to load images faved by the person who took that photo.\nLong press a photo to see it on Flickr.\n\nVersion 0.3.0</string>
+    <string name="help_text">Tap a photo to load images faved by the person who took that photo.\nLong press a photo to see it on Flickr.\n\nVersion 0.3.1</string>
 
     <string name="pref_userid">Flickr User ID</string>
     <string name="pref_userid_summ">Put your Flickr ID number or username here.</string>
